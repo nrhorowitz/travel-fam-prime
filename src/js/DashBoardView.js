@@ -12,9 +12,7 @@ class DashBoardView extends React.Component {
     }
 
     changePage(direction) {
-        if (direction === "EditProfileView") {
-            this.props.segueToEditProfileView()
-        }
+        this.props.segueToView(direction)
     }
 
     createNewButton(name, direction) {

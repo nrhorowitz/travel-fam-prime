@@ -12,9 +12,7 @@ class LandingPageView extends React.Component {
     }
 
     changePage(direction) {
-        if (direction === "EditProfileView") {
-            this.props.segueToEditProfileView()
-        }
+        this.props.segueToView(direction)
     }
 
     createNewButton(name, direction) {
@@ -33,7 +31,7 @@ class LandingPageView extends React.Component {
         return(
             <div>
                 LANDING PAGE VIEW
-                {this.createNewButton("EDIT PROFILE", "EditProfileView")}
+                {this.createNewButton("DASHBOARD", "DashBoardView")}
             </div>
         )
     }

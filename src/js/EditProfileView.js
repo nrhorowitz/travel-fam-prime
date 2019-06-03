@@ -12,9 +12,7 @@ class EditProfileView extends React.Component {
     }
 
     changePage(direction) {
-        if (direction === "LandingPageView") {
-            this.props.segueToLandingPageView()
-        }
+        this.props.segueToView(direction)
     }
 
     createNewButton(name, direction) {

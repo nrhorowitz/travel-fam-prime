@@ -4,6 +4,7 @@ import '../css/App.css';
 
 import LandingPageView from './LandingPageView.js';
 import EditProfileView from './EditProfileView.js';
+import DashBoardView from './DashBoardView.js';
 
 class App extends Component {
     constructor() {
@@ -13,35 +14,34 @@ class App extends Component {
             currentUser: null
         };
 
-        this.segueToLandingPageView = this.segueToLandingPageView.bind(this);
-        this.segueToEditProfileView = this.segueToEditProfileView.bind(this);
+        this.segueToView = this.segueToView.bind(this);
     }
 
     componentDidMount() {
 
     }
 
-    segueToLandingPageView() {
-        this.setState({currentView: "LandingPageView"});
-    }
-
-    segueToEditProfileView() {
-        this.setState({currentView: "EditProfileView"});
+    segueToView(direction) {
+        this.setState({currentView: direction});
     }
 
     currentPage() {
         if (this.state.currentView === "LandingPageView") {
             return (
                 <LandingPageView
-                    segueToLandingPageView = {this.segueToLandingPageView}
-                    segueToEditProfileView = {this.segueToEditProfileView}
+                    segueToView = {this.segueToView}
                 />
             )
         } else if (this.state.currentView === "EditProfileView") {
             return (
                 <EditProfileView
-                    segueToLandingPageView = {this.segueToLandingPageView}
-                    segueToEditProfileView = {this.segueToEditProfileView}
+                    segueToView = {this.segueToView}
+                />
+            )
+        } else if (this.state.currentView === "DashBoardView") {
+            return (
+                <DashBoardView
+                    segueToView = {this.segueToView}
                 />
             )
         }
