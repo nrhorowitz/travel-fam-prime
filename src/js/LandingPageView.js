@@ -1,39 +1,27 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import Button from '@material-ui/core/Button';
-//import './styles.css';
+import SignIn from '../components/SignIn.js';
 
 class LandingPageView extends React.Component {
     constructor(props) {
         super(props);
-        this.changePage = this.changePage.bind(this);
-        this.createNewButton = this.createNewButton.bind(this);
+        this.getPhoneFromLandingPage = this.getPhoneFromLandingPage.bind(this);
     }
 
-    changePage(direction) {
-        this.props.segueToView(direction)
-    }
-
-    createNewButton(name, direction) {
-        return (
-            <Button
-                name={name}
-                direction={direction}
-                color="primary"
-                onClick={() => this.changePage(direction)}>
-                {name}
-            </Button>
-        );
+    getPhoneFromLandingPage(number) {
+        this.props.authenticateNewUser(number);
+        this.props.segueToView("SMSVerificationView");
     }
 
     render() {
-        return(
+        return (
             <div>
-                LANDING PAGE VIEW
-                {this.createNewButton("DASHBOARD", "DashBoardView")}
+                <SignIn
+                    sendPhone = {this.getPhoneFromLandingPage}
+                />
             </div>
-        )
+        );
     }
 }
 

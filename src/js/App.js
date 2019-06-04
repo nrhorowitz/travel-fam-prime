@@ -5,16 +5,20 @@ import '../css/App.css';
 import LandingPageView from './LandingPageView.js';
 import EditProfileView from './EditProfileView.js';
 import DashBoardView from './DashBoardView.js';
+import SMSVerificationView from './SMSVerificationView.js';
+import LoginWithPasswordView from './LoginWithPasswordView.js';
 
 class App extends Component {
     constructor() {
         super();
         this.state = {
             currentView: "LandingPageView",
-            currentUser: null
+            currentUser: null,
+            phoneEntry: ""
         };
 
         this.segueToView = this.segueToView.bind(this);
+        this.authenticateNewUser = this.authenticateNewUser.bind(this);
     }
 
     componentDidMount() {
@@ -25,11 +29,16 @@ class App extends Component {
         this.setState({currentView: direction});
     }
 
+    authenticateNewUser(phone) {
+        this.setState({phoneEntry: phone});
+    }
+
     currentPage() {
         if (this.state.currentView === "LandingPageView") {
             return (
                 <LandingPageView
                     segueToView = {this.segueToView}
+                    authenticateNewUser = {this.authenticateNewUser}
                 />
             )
         } else if (this.state.currentView === "EditProfileView") {
@@ -42,6 +51,20 @@ class App extends Component {
             return (
                 <DashBoardView
                     segueToView = {this.segueToView}
+                />
+            )
+        } else if (this.state.currentView === "SMSVerificationView") {
+            return (
+                <SMSVerificationView
+                    segueToView = {this.segueToView}
+                    phoneEntry = {this.state.phoneEntry}
+                />
+            )
+        } else if (this.state.currentView === "LoginWithPasswordView") {
+            return (
+                <LoginWithPasswordView
+                    segueToView = {this.segueToView}
+                    phoneEntry = {this.state.phoneEntry}
                 />
             )
         }
