@@ -10,13 +10,14 @@ class SMSVerificationView extends React.Component {
     constructor(props) {
         super(props);
         this.changePage = this.changePage.bind(this);
+        //this.props.phoneEntry
     }
 
     changePage(direction) {
         this.props.segueToView(direction)
     }
 
-    
+
 
     render() {
         return (

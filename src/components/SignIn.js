@@ -39,7 +39,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 var phone = "";
-var phoneError = true;
+var phoneError = false;
 
 export default function SignIn(props) {
   const classes = useStyles();
