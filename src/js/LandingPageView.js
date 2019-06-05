@@ -4,6 +4,10 @@ import firebase from "firebase"
 import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth"
 import firebaseui from 'firebaseui'
 
+import Typography from '@material-ui/core/Typography';
+
+var globalProps = "";
+
 firebase.initializeApp({
     apiKey: "AIzaSyAtrvGB8pwYWmyRwG02svHpAkh5QWzh9yk",
     authDomain: "travelfamprime.firebaseapp.com",
@@ -16,8 +20,6 @@ firebase.initializeApp({
     //apiKey: "AIzaSyDLoqcbTDMFuurtAyDgVEKZ6qwo0j0Osjk",
     //authDomain: "fir-auth-tutorial-ed11f.firebaseapp.com"
 })
-
-
 
 /**
  * @return {!Object} The FirebaseUI config.
@@ -69,6 +71,7 @@ var handleSignedInUser = function(user) {
     } else {
         document.getElementById('photo').style.display = 'none';
     }
+    globalProps.setNewUser(user);
 };
 
 /**
@@ -123,6 +126,15 @@ window.addEventListener('load', initApp);
 
 
 class LandingPageView extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            currentUser: null
+        };
+        globalProps = props;
+        //globalProps = this.props;
+    }
+
     render() {
         return (
             <div id="container">
@@ -146,7 +158,9 @@ class LandingPageView extends Component {
                             </p>
                         </div>
                         <div id="user-signed-out" class="hidden">
-                            <h4>You are signed out.</h4>
+                            <Typography variant="h2" component="h2" gutterBottom>
+                                Get started with TravelFam
+                            </Typography>
                             <div id="firebaseui-spa">
                                 <div id="firebaseui-container"></div>
                             </div>

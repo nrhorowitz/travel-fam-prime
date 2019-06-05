@@ -19,6 +19,7 @@ class App extends Component {
 
         this.segueToView = this.segueToView.bind(this);
         this.authenticateNewUser = this.authenticateNewUser.bind(this);
+        this.setNewUser = this.setNewUser.bind(this);
     }
 
     componentDidMount() {
@@ -33,12 +34,21 @@ class App extends Component {
         this.setState({phoneEntry: phone});
     }
 
+    setNewUser(user) {
+        this.setState({currentUser: user});
+        console.log("CURRENTUSER: ");
+        console.log(this.state.currentUser);
+        //alert(this.state.currentUser);
+    }
+
+
+
     currentPage() {
         if (this.state.currentView === "LandingPageView") {
             return (
                 <LandingPageView
                     segueToView = {this.segueToView}
-                    authenticateNewUser = {this.authenticateNewUser}
+                    setNewUser = {this.setNewUser}
                 />
             )
         } else if (this.state.currentView === "EditProfileView") {
