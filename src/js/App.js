@@ -12,22 +12,16 @@ import CreateNameView from './CreateNameView.js';
 import CreateEmailView from './CreateEmailView.js';
 import CreatePasswordView from './CreatePasswordView.js';
 
+import firebase from 'firebase';
 
+const db = firebase.firestore();
 
 class App extends Component {
     constructor() {
         super();
         this.state = {
             currentView: "SMSVerificationView",
-            currentUser: null,
-            newUserEntry: {
-                id: "",
-                phone: "",
-                firstName: "",
-                lastName: "",
-                email: "",
-                password: ""
-            }
+            currentUserId: null
         };
 
         this.segueToView = this.segueToView.bind(this);
@@ -44,31 +38,27 @@ class App extends Component {
     }
 
     addNewUserInfo(pair) {
-        var tempUserEntry = this.state.newUserEntry;
         var key = pair[0];
         var val = pair[1];
-        if (key == "id") {
-            tempUserEntry.id = val;
-        } else if (key == "phone") {
-            tempUserEntry.phone = val;
-        } else if (key == "firstName") {
-            tempUserEntry.firstName = val;
-        } else if (key == "lastName") {
-            tempUserEntry.lastName = val;
-        } else if (key == "email") {
-            tempUserEntry.email = val;
-        } else if (key == "password") {
-            tempUserEntry.password = val;
-        }
-        this.setState({newUserEntry: tempUserEntry});
-        //console.log(this.state.newUserEntry);
+        db.collection('users').doc(this.state.currentUserId).update({
+            [key]: val
+        }).catch(function(error) {
+            console.error("Error writing document: ", error);
+        });
     }
 
     setNewUser(user) {
-        this.setState({currentUser: user});
-        console.log("CURRENTUSER: ");
-        console.log(this.state.currentUser);
-        //alert(this.state.currentUser);
+        console.log(user);
+        this.setState({currentUserId: user.uid});
+        db.collection('users').doc(this.state.currentUserId).update({
+            "phone": user.phoneNumber
+        }).catch(function(error) {
+            console.error("Error writing document: ", error);
+        });
+    }
+
+    existingUser(id) {
+
     }
 
 
@@ -78,7 +68,6 @@ class App extends Component {
             return (
                 <LandingPageView
                     segueToView = {this.segueToView}
-                    setNewUser = {this.setNewUser}
                 />
             )
         } else if (this.state.currentView === "EditProfileView") {
@@ -98,6 +87,7 @@ class App extends Component {
                 <SMSVerificationView
                     segueToView = {this.segueToView}
                     setNewUser = {this.setNewUser}
+                    firebase = {firebase}
                 />
             )
         } else if (this.state.currentView === "LoginWithPasswordView") {

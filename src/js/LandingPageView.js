@@ -10,7 +10,6 @@ class LandingPageView extends React.Component {
     }
 
     getPhoneFromLandingPage(number) {
-        this.props.authenticateNewUser(number);
         this.props.segueToView("SMSVerificationView");
     }
 
