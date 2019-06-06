@@ -13,6 +13,9 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 
+import firebase from 'firebase';
+import 'firebase/auth';
+
 const useStyles = makeStyles(theme => ({
   '@global': {
     body: {
@@ -38,58 +41,36 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-var phone = "";
-var phoneError = false;
+const db = firebase.firestore();
 
-export default function SignIn(props) {
+var password = "";
+
+export default function LoginWithPassword(props) {
   const classes = useStyles();
-
-  function sendPhone(e) {
-    e.preventDefault();
-    if (validPhone(phone)) {
-        props.handlePhoneEntry(phone);
-    } else {
-        phoneError = true;
-        //this.forceUpdate();
-        alert("please enter a valid phone number"); //THIS IS SUS (change with component function?)
-    }
+  function handleChangePassword(e) {
+     password = e.target.value;
   }
-  function validPhone(num) {
-      return true; //TODO: ADD RESTRICTIONS
-      //return /^\d+$/.test(num);
-  }
-  function handleChange(e) {
-     phone = e.target.value;
-  }
-  function textField(error) {
-      if (error) {
-          return <TextField
-            error
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            id="phone"
-            label="Phone Number"
-            name="Phone"
-            autoComplete="phone"
-            autoFocus
-            onChange={handleChange}
-          />;
-      } else {
-          return <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            id="phone"
-            label="Phone Number"
-            name="Phone"
-            autoComplete="phone"
-            autoFocus
-            onChange={handleChange}
-          />;
+  function next() {
+      if (validInput()) {
+          db.collection('users').get().then((snapshot) => {
+              snapshot.forEach((doc) => {
+                  if ((doc.data().id == props.id) && (doc.data().password == password)) {
+                      //FIREBASE FORCE LOGIN with credential
+                      alert(doc.data().id);
+                      var credential = doc.data().credential;
+                      firebase.auth().signInWithCredential(credential);
+                      //TODO: not scalable brute force O(n) method, change later
+                      props.segueToView("DashBoardView"); //TODO: does this happen anyways
+                      return;
+                  }
+              });
+          }).catch((err) => {
+              console.log('Error getting documents', err);
+          });
       }
+  }
+  function validInput() {
+      return true; //TODO: ADD CONDITIONS
   }
   return (
     <Container component="main" maxWidth="xs">
@@ -99,10 +80,24 @@ export default function SignIn(props) {
           <LockOutlinedIcon />
         </Avatar>
         <Typography component="h1" variant="h5">
-          Please enter your phone number to continue
+          So that we can contact you...
         </Typography>
-        <form className={classes.form} onSubmit={sendPhone} noValidate>
-          {textField(phoneError)}
+        <Typography component="h1" variant="h4">
+          LOGIN WITH PASSWORD
+        </Typography>
+        <form className={classes.form} onSubmit={next} noValidate>
+          <TextField
+              variant="outlined"
+              margin="normal"
+              required
+              fullWidth
+              id="password"
+              label="Password"
+              name="password"
+              autoComplete="password"
+              autoFocus
+              onChange={handleChangePassword}
+            />
           <Button
             type="submit"
             fullWidth
@@ -110,7 +105,7 @@ export default function SignIn(props) {
             color="primary"
             className={classes.submit}
           >
-            NEXT
+            LOGIN
           </Button>
         </form>
       </div>

@@ -23,7 +23,7 @@ class App extends Component {
         super();
         this.state = {
             currentUserId: "",
-            currentView: "LoadingPageView"
+            currentView: "LoadingPageView",
         };
         this.segueToView = this.segueToView.bind(this);
         this.addNewUserInfo = this.addNewUserInfo.bind(this);
@@ -41,8 +41,8 @@ class App extends Component {
                 return;
             },
         );
-        //this.segueToView("LandingPageView");
-        this.segueToView("SMSVerificationView");
+        this.segueToView("LandingPageView");
+        //this.segueToView("SMSVerificationView");
     }
 
     componentWillUnmount() {
@@ -63,11 +63,12 @@ class App extends Component {
         });
     }
 
-    setNewUser(user) {
+    setNewUser(user, credential) {
         console.log(user);
         this.setState({currentUserId: user.uid});
         db.collection('users').doc(this.state.currentUserId).update({
-            "phone": user.phoneNumber
+            "phone": user.phoneNumber,
+            "credential": credential
         }).catch(function(error) {
             console.error("Error writing document: ", error);
         });
@@ -79,11 +80,13 @@ class App extends Component {
                 if (doc.data().phone == phone) {
                     return doc.id;
                 }
+            }).then(() => {
+                var a = 1; //FILLER
             });
         }).catch((err) => {
             console.log('Error getting documents', err);
         });
-        return "None"
+        return "None";
     }
 
     handlePhoneEntry(phone) {
@@ -98,7 +101,6 @@ class App extends Component {
     }
 
     updateViewToId() {
-        alert(this.state.currentUserId);
         if (this.state.currentUserId.length > 8) {
             this.segueToView("DashBoardView");
         } else {
@@ -131,13 +133,14 @@ class App extends Component {
                     segueToView = {this.segueToView}
                     setNewUser = {this.setNewUser}
                     firebase = {firebase}
+                    addNewUserInfo = {this.addNewUserInfo}
                 />
             )
         } else if (this.state.currentView === "LoginWithPasswordView") {
             return (
                 <LoginWithPasswordView
                     segueToView = {this.segueToView}
-                    phoneEntry = "6666666666" ///TEMP - call from database
+                    id = {this.state.currentUserId}
                 />
             )
         } else if (this.state.currentView === "InvitedByView") {

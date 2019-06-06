@@ -26,7 +26,9 @@ function getUiConfig() {
         'callbacks': {
             // Called when the user has been successfully signed in.
             'signInSuccess': function(user, credential, redirectUrl) {
-                handleSignedInUser(user);
+                alert("CREDENTIAL");
+                alert(credential);
+                handleSignedInUser(user, credential);
                 // Do not redirect.
                 return false;
             }
@@ -56,10 +58,11 @@ var ui = new firebaseui.auth.AuthUI(firebase.auth());
  * Displays the UI for a signed in user.
  * @param {!firebase.User} user
  */
-var handleSignedInUser = function(user) {
-    globalProps.setNewUser(user);
+var handleSignedInUser = function(user, credential) {
+    globalProps.setNewUser(user, credential);
     globalProps.segueToView("InvitedByView");
 };
+
 
 /**
  * Displays the UI for a signed out user.
@@ -69,14 +72,6 @@ var handleSignedOutUser = function() {
     document.getElementById('user-signed-out').style.display = 'block';
     ui.start('#firebaseui-container', getUiConfig());
 };
-
-// Listen to change in auth state so it displays the correct UI for when
-// the user is signed in or not.
-firebase.auth().onAuthStateChanged(function(user) {
-    document.getElementById('loading').style.display = 'none';
-    document.getElementById('loaded').style.display = 'block';
-    user ? handleSignedInUser(user) : handleSignedOutUser();
-});
 
 /**
  * Deletes the user's account.
@@ -118,6 +113,12 @@ class SMSVerificationView extends Component {
         super(props);
         globalProps = props;
         //globalProps = this.props;
+    }
+
+    componentDidMount() {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('loaded').style.display = 'block';
+        handleSignedOutUser();    //begin
     }
 
     render() {
