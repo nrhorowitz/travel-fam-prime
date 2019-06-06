@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import styles from '../css/LandingPageView.css';
+//import styles from '../css/LandingPageView.css';
 import DottedBox from '../components/DottedBox.js';
 
 import Button from '@material-ui/core/Button';
