@@ -38,25 +38,20 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-var firstName = "";
-var lastName = "";
+var password = "";
 
-export default function CreateNameEmail(props) {
+export default function CreateEmail(props) {
   const classes = useStyles();
-  function handleChangeFirstName(e) {
-     firstName = e.target.value;
-  }
-  function handleChangeLastName(e) {
-     lastName = e.target.value;
+  function handleChangePassword(e) {
+     password = e.target.value;
   }
   function next() {
-      if (validNames()) {
-          props.addNewUserInfo(["firstName", firstName]);
-          props.addNewUserInfo(["lastName", lastName]);
-          props.segueToView("CreatePasswordView")
+      if (validInput()) {
+          props.addNewUserInfo(["password", password]);
+          props.segueToView("DashBoardView");
       }
   }
-  function validNames() {
+  function validInput() {
       return true; //TODO: ADD CONDITIONS
   }
   return (
@@ -66,8 +61,11 @@ export default function CreateNameEmail(props) {
         <Avatar className={classes.avatar}>
           <LockOutlinedIcon />
         </Avatar>
+        <Typography component="h1" variant="h5">
+          Last Step
+        </Typography>
         <Typography component="h1" variant="h4">
-          What's your name?
+          Create a Password
         </Typography>
         <form className={classes.form} onSubmit={next} noValidate>
         <TextField
@@ -75,25 +73,13 @@ export default function CreateNameEmail(props) {
             margin="normal"
             required
             fullWidth
-            id="firstName"
-            label="First Name"
-            name="firstName"
-            autoComplete="firstName"
+            id="password"
+            label="Password"
+            name="password"
+            autoComplete="password"
             autoFocus
-            onChange={handleChangeFirstName}
+            onChange={handleChangePassword}
           />
-          <TextField
-              variant="outlined"
-              margin="normal"
-              required
-              fullWidth
-              id="lastName"
-              label="Last Name"
-              name="lastName"
-              autoComplete="lastName"
-              autoFocus
-              onChange={handleChangeLastName}
-            />
           <Button
             type="submit"
             fullWidth
@@ -101,15 +87,9 @@ export default function CreateNameEmail(props) {
             color="primary"
             className={classes.submit}
           >
-            SIGN UP
+            NEXT
           </Button>
         </form>
-        <Typography component="h1" variant="h5">
-          Please use your full and real name!
-        </Typography>
-        <Typography component="h1" variant="h6">
-          Our community is built on civility and real identity. No fake names please.
-        </Typography>
       </div>
     </Container>
   );

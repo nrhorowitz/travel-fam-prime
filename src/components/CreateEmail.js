@@ -38,25 +38,20 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-var firstName = "";
-var lastName = "";
+var email = "";
 
 export default function CreateEmail(props) {
   const classes = useStyles();
-  function handleChangeFirstName(e) {
-     firstName = e.target.value;
-  }
-  function handleChangeLastName(e) {
-     lastName = e.target.value;
+  function handleChangeEmail(e) {
+     email = e.target.value;
   }
   function next() {
-      if (validNames()) {
-          props.addNewUserInfo(["firstName", firstName]);
-          props.addNewUserInfo(["lastName", lastName]);
-          props.segueToView("CreatePasswordView")
+      if (validInput()) {
+          props.addNewUserInfo(["email", email]);
+          props.segueToView("CreatePasswordView");
       }
   }
-  function validNames() {
+  function validInput() {
       return true; //TODO: ADD CONDITIONS
   }
   return (
@@ -73,29 +68,17 @@ export default function CreateEmail(props) {
           What's your email?
         </Typography>
         <form className={classes.form} onSubmit={next} noValidate>
-        <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            id="firstName"
-            label="First Name"
-            name="firstName"
-            autoComplete="firstName"
-            autoFocus
-            onChange={handleChangeFirstName}
-          />
           <TextField
               variant="outlined"
               margin="normal"
               required
               fullWidth
-              id="lastName"
-              label="Last Name"
-              name="lastName"
-              autoComplete="lastName"
+              id="email"
+              label="Email"
+              name="email"
+              autoComplete="email"
               autoFocus
-              onChange={handleChangeLastName}
+              onChange={handleChangeEmail}
             />
           <Button
             type="submit"
@@ -104,7 +87,7 @@ export default function CreateEmail(props) {
             color="primary"
             className={classes.submit}
           >
-            SIGN UP
+            NEXT
           </Button>
         </form>
       </div>

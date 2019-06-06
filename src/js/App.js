@@ -9,6 +9,10 @@ import SMSVerificationView from './SMSVerificationView.js';
 import LoginWithPasswordView from './LoginWithPasswordView.js';
 import InvitedByView from './InvitedByView.js';
 import CreateNameView from './CreateNameView.js';
+import CreateEmailView from './CreateEmailView.js';
+import CreatePasswordView from './CreatePasswordView.js';
+
+
 
 class App extends Component {
     constructor() {
@@ -17,6 +21,7 @@ class App extends Component {
             currentView: "SMSVerificationView",
             currentUser: null,
             newUserEntry: {
+                id: "",
                 phone: "",
                 firstName: "",
                 lastName: "",
@@ -42,7 +47,9 @@ class App extends Component {
         var tempUserEntry = this.state.newUserEntry;
         var key = pair[0];
         var val = pair[1];
-        if (key == "phone") {
+        if (key == "id") {
+            tempUserEntry.id = val;
+        } else if (key == "phone") {
             tempUserEntry.phone = val;
         } else if (key == "firstName") {
             tempUserEntry.firstName = val;
@@ -116,15 +123,17 @@ class App extends Component {
             )
         } else if (this.state.currentView === "CreateEmailView") {
             return (
-                <div>
-                    CreatePasswordView
-                </div>
+                <CreateEmailView
+                    segueToView = {this.segueToView}
+                    addNewUserInfo = {this.addNewUserInfo}
+                />
             )
         } else if (this.state.currentView === "CreatePasswordView") {
             return (
-                <div>
-                    CreatePasswordView
-                </div>
+                <CreatePasswordView
+                    segueToView = {this.segueToView}
+                    addNewUserInfo = {this.addNewUserInfo}
+                />
             )
         }
     }

@@ -53,7 +53,7 @@ export default function CreateName(props) {
       if (validNames()) {
           props.addNewUserInfo(["firstName", firstName]);
           props.addNewUserInfo(["lastName", lastName]);
-          props.segueToView("CreatePasswordView")
+          props.segueToView("CreateEmailView")
       }
   }
   function validNames() {
