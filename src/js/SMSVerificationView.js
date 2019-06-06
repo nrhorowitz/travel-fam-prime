@@ -26,7 +26,6 @@ function getUiConfig() {
         'callbacks': {
             // Called when the user has been successfully signed in.
             'signInSuccess': function(user, credential, redirectUrl) {
-                alert("CREDENTIAL");
                 alert(credential);
                 handleSignedInUser(user, credential);
                 // Do not redirect.

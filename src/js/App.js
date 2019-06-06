@@ -58,6 +58,8 @@ class App extends Component {
         var val = pair[1];
         db.collection('users').doc(this.state.currentUserId).update({
             [key]: val
+        }).then(() => {
+            return;
         }).catch(function(error) {
             console.error("Error writing document: ", error);
         });
@@ -66,7 +68,7 @@ class App extends Component {
     setNewUser(user, credential) {
         console.log(user);
         this.setState({currentUserId: user.uid});
-        db.collection('users').doc(this.state.currentUserId).update({
+        db.collection('users').doc(this.state.currentUserId).set({
             "phone": user.phoneNumber,
             "credential": credential
         }).catch(function(error) {
