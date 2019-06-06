@@ -47,7 +47,7 @@ export default function SignIn(props) {
   function sendPhone(e) {
     e.preventDefault();
     if (validPhone(phone)) {
-        props.sendPhone(phone);
+        props.handlePhoneEntry(phone);
     } else {
         phoneError = true;
         //this.forceUpdate();

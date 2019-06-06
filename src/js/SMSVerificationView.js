@@ -116,9 +116,6 @@ window.addEventListener('load', initApp);*/
 class SMSVerificationView extends Component {
     constructor(props) {
         super(props);
-        this.state = {
-            currentUser: null
-        };
         globalProps = props;
         //globalProps = this.props;
     }

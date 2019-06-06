@@ -6,18 +6,13 @@ import SignIn from '../components/SignIn.js';
 class LandingPageView extends React.Component {
     constructor(props) {
         super(props);
-        this.getPhoneFromLandingPage = this.getPhoneFromLandingPage.bind(this);
-    }
-
-    getPhoneFromLandingPage(number) {
-        this.props.segueToView("SMSVerificationView");
     }
 
     render() {
         return (
             <div>
                 <SignIn
-                    sendPhone = {this.getPhoneFromLandingPage}
+                    handlePhoneEntry = {this.props.handlePhoneEntry}
                 />
             </div>
         );

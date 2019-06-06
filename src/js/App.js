@@ -11,8 +11,10 @@ import InvitedByView from './InvitedByView.js';
 import CreateNameView from './CreateNameView.js';
 import CreateEmailView from './CreateEmailView.js';
 import CreatePasswordView from './CreatePasswordView.js';
+import LoadingPageView from './LoadingPageView.js';
 
 import firebase from 'firebase';
+import 'firebase/auth';
 
 const db = firebase.firestore();
 
@@ -20,17 +22,31 @@ class App extends Component {
     constructor() {
         super();
         this.state = {
-            currentView: "SMSVerificationView",
-            currentUserId: null
+            currentUserId: "",
+            currentView: "LoadingPageView"
         };
-
         this.segueToView = this.segueToView.bind(this);
         this.addNewUserInfo = this.addNewUserInfo.bind(this);
         this.setNewUser = this.setNewUser.bind(this);
+        this.existingUser = this.existingUser.bind(this);
+        this.handlePhoneEntry = this.handlePhoneEntry.bind(this);
+        this.updateViewToId = this.updateViewToId.bind(this);
     }
 
     componentDidMount() {
+        this.listener = firebase.auth().onAuthStateChanged(
+            authUser => {
+                this.setState({currentUserId: authUser.uid})
+                this.updateViewToId();
+                return;
+            },
+        );
+        //this.segueToView("LandingPageView");
+        this.segueToView("SMSVerificationView");
+    }
 
+    componentWillUnmount() {
+        this.listener();
     }
 
     segueToView(direction) {
@@ -57,17 +73,44 @@ class App extends Component {
         });
     }
 
-    existingUser(id) {
-
+    existingUser(phone) {
+        db.collection('users').get().then((snapshot) => {
+            snapshot.forEach((doc) => {
+                if (doc.data().phone == phone) {
+                    return doc.id;
+                }
+            });
+        }).catch((err) => {
+            console.log('Error getting documents', err);
+        });
+        return "None"
     }
 
+    handlePhoneEntry(phone) {
+        var id = this.existingUser(phone);
+        if (id == "None") {
+            //TODO: send phone number so you dont need to retype
+            this.segueToView("SMSVerificationView");
+        } else {
+            this.setState({currentUserId: id});
+            this.segueToView("LoginWithPasswordView");
+        }
+    }
 
+    updateViewToId() {
+        alert(this.state.currentUserId);
+        if (this.state.currentUserId.length > 8) {
+            this.segueToView("DashBoardView");
+        } else {
+            this.segueToView("LandingPageView");
+        }
+    }
 
     currentPage() {
         if (this.state.currentView === "LandingPageView") {
             return (
                 <LandingPageView
-                    segueToView = {this.segueToView}
+                    handlePhoneEntry = {this.handlePhoneEntry}
                 />
             )
         } else if (this.state.currentView === "EditProfileView") {
