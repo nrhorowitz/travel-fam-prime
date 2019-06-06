@@ -2,7 +2,9 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import Button from '@material-ui/core/Button';
-//import './styles.css';
+import AppNavBar from './components/AppNavBar.js';
+import ContentContainer from './components/ContentContainer.js';
+import '../css/App.css';
 
 class DashBoardView extends React.Component {
     constructor(props) {
@@ -28,10 +30,16 @@ class DashBoardView extends React.Component {
     }
 
     render() {
+        
         return(
             <div>
-                DashBoardView
-                {this.createNewButton("EDIT PROFILE", "EditProfileView")}
+                {/* DashBoardView
+                {this.createNewButton("EDIT PROFILE", "EditProfileView")} */}
+
+                <AppNavBar></AppNavBar>
+                
+                <ContentContainer></ContentContainer>
+                
             </div>
         )
     }
