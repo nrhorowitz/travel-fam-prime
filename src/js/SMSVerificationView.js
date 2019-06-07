@@ -25,9 +25,8 @@ function getUiConfig() {
     return {
         'callbacks': {
             // Called when the user has been successfully signed in.
-            'signInSuccess': function(user, credential, redirectUrl) {
-                alert(credential);
-                handleSignedInUser(user, credential);
+            'signInSuccess': function(result) {
+                handleSignedInUser(result);
                 // Do not redirect.
                 return false;
             }
@@ -42,11 +41,14 @@ function getUiConfig() {
                     type: 'image',
                     size: 'invisible',
                     badge: 'bottomleft'
-                }
+                },
+                defaultCountry: 'US',
+                loginHint: '+11234567890',
             }
         ],
         // Terms of service url.
-        'tosUrl': 'https://www.google.com'
+        'tosUrl': 'https://travelfam.io/terms_of_service.html',
+        'privacyPolicyUrl': 'https://travelfam.io/privacy_policy.html'
     };
 }
 
@@ -57,8 +59,9 @@ var ui = new firebaseui.auth.AuthUI(firebase.auth());
  * Displays the UI for a signed in user.
  * @param {!firebase.User} user
  */
-var handleSignedInUser = function(user, credential) {
-    globalProps.setNewUser(user, credential);
+var handleSignedInUser = function(user) {
+    alert(firebase.currentUser);
+    globalProps.setNewUser(user);
     globalProps.segueToView("InvitedByView");
 };
 

@@ -36,6 +36,7 @@ class App extends Component {
     componentDidMount() {
         this.listener = firebase.auth().onAuthStateChanged(
             authUser => {
+                firebase.auth().currentUser = authUser;
                 this.setState({currentUserId: authUser.uid})
                 this.updateViewToId();
                 return;
@@ -65,12 +66,13 @@ class App extends Component {
         });
     }
 
-    setNewUser(user, credential) {
+    setNewUser(user) {
+        alert(firebase.currentUser);
         console.log(user);
         this.setState({currentUserId: user.uid});
         db.collection('users').doc(this.state.currentUserId).set({
             "phone": user.phoneNumber,
-            "credential": credential
+            //"credential": user.c
         }).catch(function(error) {
             console.error("Error writing document: ", error);
         });
