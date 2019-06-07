@@ -42,7 +42,8 @@ class App extends Component {
                 return;
             },
         );
-        this.segueToView("LandingPageView");
+        //this.segueToView("LandingPageView");
+        this.segueToView("DashBoardView");
         //this.segueToView("SMSVerificationView");
     }
 
@@ -129,6 +130,7 @@ class App extends Component {
             return (
                 <DashBoardView
                     segueToView = {this.segueToView}
+                    db = {db}
                 />
             )
         } else if (this.state.currentView === "SMSVerificationView") {

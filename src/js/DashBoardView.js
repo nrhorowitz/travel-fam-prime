@@ -30,16 +30,18 @@ class DashBoardView extends React.Component {
     }
 
     render() {
-        
+
         return(
             <div>
                 {/* DashBoardView
                 {this.createNewButton("EDIT PROFILE", "EditProfileView")} */}
 
                 <AppNavBar></AppNavBar>
-                
-                <ContentContainer></ContentContainer>
-                
+
+                <ContentContainer
+                    db = {this.props.db}
+                ></ContentContainer>
+
             </div>
         )
     }

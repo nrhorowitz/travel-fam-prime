@@ -11,7 +11,7 @@ import '../../css/App.css'
 
 const useStyles = makeStyles(theme => ({
     container: {
-        
+
         top:"0",
         left:"0",
         right:"0",
@@ -36,40 +36,42 @@ const useStyles = makeStyles(theme => ({
         position: "sticky",
         // boxShadow: "0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 2px 4px 0 rgba(0, 0, 0, 0.2)",
 
-    }, 
+    },
     feed: {
-        
+
         // backgroundColor: "#EDEDED",
         width: "100%",
         height: "100%",
         marginLeft: "40px",
-        
+
         display: "inline-block",
         top: "0",
         // boxShadow: "0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 2px 4px 0 rgba(0, 0, 0, 0.2)",
         // borderRadius: "5px",
         float: "left"
     },
-    
+
 }));
 
-export default function ContentContainer() {
+export default function ContentContainer(props) {
     const classes = useStyles();
-    
+
     return (
         <Container className={classes.container}>
             <div className={classes.wrapper}>
-                
+
                 <div className={classes.rowSideBar}>
                     <GenreSideBar style={{ marginTop: "20px"}}></GenreSideBar>
-                    <NetworkSideBar style={{ marginTop: "20px"}}></NetworkSideBar> 
+                    <NetworkSideBar style={{ marginTop: "20px"}}></NetworkSideBar>
                 </div>
                 <div className={classes.feed}>
                     <FeedHeader></FeedHeader>
-                    <FeedBody></FeedBody>
-                    
+                    <FeedBody
+                        db = {props.db}
+                    ></FeedBody>
+
                 </div>
-                
+
             </div>
         </Container>
     );
