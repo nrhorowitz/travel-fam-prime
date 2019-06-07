@@ -59,16 +59,31 @@ const postedBox = {
     marginTop: "30px",
     minHeight: "20vh",
     display: "flex",
-    position: "relative"
+    position: "relative",
+    
     // borderStyle: "solid",
     // borderWidth: "1px",
     // borderColor: "#FD6D6E"
 }
+const commentLine = {
+    borderLeft: "2px solid #FD6D6E",
+    marginLeft: "10px",
+    marginRight: "20px",
+    marginTop: "10px",
+    marginBottom: "15px",
+    height: "flex"
+    
+    
+    
+    
+
+}
 const outputPost = {
-    marginLeft: "20px",
+    marginLeft: "5px",
     height: "flex",
-    width: "flex",
+    width: "30vw",
     overflowWrap: "break-word",
+    
     flex: "1"
     
 }
@@ -91,10 +106,16 @@ const footerText = {
 const footerGroup = {
     position: "absolute", 
     bottom: "0",
-    margin: "15px",
+    marginBottom: "15px",
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-around"
+}
+const testing = {
+    backgroundColor: "#4286f4",
+    borderRadius: "20px", 
+    // boxShadow: "0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 2px 4px 0 rgba(0, 0, 0, 0.2)",
+    
 }
 
 class FeedBody extends Component { 
@@ -103,15 +124,35 @@ class FeedBody extends Component {
         this.state={
             //hardcoding posts for now
             items: [
+                {id: uuid(), post: "oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo"},
                 {id: uuid(), post: 'Hihihii', replies: {id: uuid(), reply: 'Byebyebye'}},
                 {id: uuid(), post: "raveraverave"},
-                {id: uuid(), post: 'travelfaaaaam'}
+                {id: uuid(), post: 'travelfaaaaam'},
+                
             ]
         }
+        this.addElement = this.addElement.bind(this);
+        this.removeElement = this.removeElement.bind(this);
+        this.replyToPost = this.replyToPost.bind(this); 
+    }
+
+    addElement(parentId, elementTag, elementId, html) {
+        var p = document.getElementById(parentId);
+        var newElement = document.createElement(elementTag);
+        newElement.setAttribute('id', elementId);
+        newElement.innerHTML = html;
+        newElement.setAttribute("style", testing);
+        p.appendChild(newElement);
+    }
+
+    removeElement(elementId) {
+        var element = document.getElementById(elementId);
+        element.parentNode.removeChild(element); 
     }
 
     replyToPost() {
-        alert("REPLY!")
+        var html = "<div> <AccountTag></AccountTag> </div>"
+        this.addElement('postedBox', 'div', 'testing', html);
     }
     
     render() {
@@ -140,7 +181,7 @@ class FeedBody extends Component {
                         }
                         
                     }}>
-
+                    
                         POST
 
                     </Button>
@@ -149,23 +190,37 @@ class FeedBody extends Component {
                 {/* Existing posts timeline */}
                 <List>
                     {items.map(({id, post}) => (
-                        <ListItem style={postedBox}>
-                            <div style={{marginBottom: "70px"}}>
-                                <AccountTag></AccountTag>
-                                <div id="outputPost" style={outputPost}>
-                                    {post}
+                        
+                        <ListItem id="postedBox" style={postedBox}>
+                            <div style={commentLine}>
+                                <div style={{marginBottom: "70px", marginLeft: "20px"}}>
+                                    
+                                        <AccountTag></AccountTag>
+                                    
+                                    
+                                        <div id="outputPost" style={outputPost}>
+                                            
+                                                {post}
+                                            
+                                        </div>
+                                        
+                                        
+                                        {/* Interested, Reply, Share post footers */}
+                                        <div style={footerGroup}>
+                                            
+                                            <div style={footerText} ><img style={footerImages} src={interested_svg} alt="star"/> Interested</div>
+                                            <button onClick={this.replyToPost} style={footerText}><img style={footerImages} src={reply_svg} alt="reply"/> Reply</button>
+                                            <div style={footerText}><img style={footerImages} src={share_svg} alt="reply"/> Share</div>
+                                            
+                                        </div>
+
+                                        {/* need to add reply comment ui here  */}
                                 </div>
-                                {/* Interested, Reply, Share post footers */}
-                                <div style={footerGroup}>
                                     
-                                    <div style={footerText} ><img style={footerImages} src={interested_svg} alt="star"/> Interested</div>
-                                    <button onClick={this.replyToPost} style={footerText}><img style={footerImages} src={reply_svg} alt="reply"/> Reply</button>
-                                    <div style={footerText}><img style={footerImages} src={share_svg} alt="reply"/> Share</div>
-                                    
-                                    
-                                </div>
                             </div>
+                            
                         </ListItem>
+                        
                     ))}
                 </List>
             </div>

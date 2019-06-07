@@ -41,6 +41,11 @@ const useStyles = makeStyles(theme => ({
         
     
     },
+    commentLine: {
+        borderLeft: "2px solid #FD6D6E",
+        marginRight: "5px",
+        height: "100%"
+    }
     
 
     
@@ -50,14 +55,20 @@ export default function AccountTag() {
     const classes = useStyles();
     return (
         <div>
-            <div style={{alignItems: "center", marginBottom: "30px", marginTop: "10px"}}>
+            <div style={{alignItems: "center", marginBottom: "30px"}}>
+                    
+                
                 <div className={classes.profilePictureBorder}>
-                    <img className={classes.profilePicture} src={logo} alt="logo"/>
+                    
+                        <img className={classes.profilePicture} src={logo} alt="logo"/>
+                    
                 </div>
+                
                 <div style={{marginLeft: "60px", paddingTop: "5px"}}>
                     <div className={classes.profileName}>TravelFam</div>
                     <div className={classes.profileLocation}>Berkeley, CA</div>
-                </div>    
+                </div>   
+                
             </div>
         </div>
 
