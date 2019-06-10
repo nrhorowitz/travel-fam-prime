@@ -8,11 +8,11 @@ const logo = require('../../img/Logo3.png');
 const useStyles = makeStyles(theme => ({
 
     profilePicture: {
-        width:"30px", 
-        height:"30px", 
-        position: "absolute", 
-        top: "50%", 
-        left: "50%", 
+        width:"30px",
+        height:"30px",
+        position: "absolute",
+        top: "50%",
+        left: "50%",
         transform: "translate(-50%, -50%)"
 
 
@@ -30,25 +30,25 @@ const useStyles = makeStyles(theme => ({
     profileName: {
         fontSize: "18px",
         color: "#000000",
-        
-       
+
+
 
 
     },
     profileLocation: {
         fontSize: "16px",
         color: "#AAAAAA",
-        
-    
+
+
     },
     commentLine: {
         borderLeft: "2px solid #FD6D6E",
         marginRight: "5px",
         height: "100%"
     }
-    
 
-    
+
+
 }));
 
 export default function AccountTag() {
@@ -56,22 +56,22 @@ export default function AccountTag() {
     return (
         <div>
             <div style={{alignItems: "center", marginBottom: "30px"}}>
-                    
-                
+
+
                 <div className={classes.profilePictureBorder}>
-                    
+
                         <img className={classes.profilePicture} src={logo} alt="logo"/>
-                    
+
                 </div>
-                
+
                 <div style={{marginLeft: "60px", paddingTop: "5px"}}>
                     <div className={classes.profileName}>TravelFam</div>
                     <div className={classes.profileLocation}>Berkeley, CA</div>
-                </div>   
-                
+                </div>
+
             </div>
         </div>
 
-        
+
     );
 }

@@ -15,6 +15,8 @@ import LoadingPageView from './LoadingPageView.js';
 
 import firebase from 'firebase';
 import 'firebase/auth';
+import {reduxFirestore, getFirestore} from 'redux-firestore';
+import {reactReduxFirebase, getFirebase} from 'react-redux-firebase';
 
 const db = firebase.firestore();
 

@@ -112,57 +112,88 @@ class FeedBody extends Component {
                 {id: uuid(), post: "raveraverave"},
                 {id: uuid(), post: 'travelfaaaaam'}
             ],
+            message: 'log',
+            loading: 'dog'
         }
         this.readBody = this.readBody.bind(this);
         this.readPosts = this.readPosts.bind(this);
         this.readSinglePost = this.readSinglePost.bind(this);
     }
 
+    componentDidMount() {
+        this.setState({loading: 'true'});
+
+        this.props.db.collection("category").doc(this.state.category).collection(this.state.channel).get().then(querySnapshot => {
+            if (querySnapshot) {
+                alert("dog");
+            } else {
+                alert("notdog");
+            }
+            querySnapshot.forEach(doc => {
+                // doc.data() is never undefined for query doc snapshots
+                //console.log(doc.id, " => ", doc.data());
+                //items.push({id: doc.id, data: "hi"});
+                alert(doc.id);
+                if (this.state.loading == 'true') {
+                    this.setState({message: doc.id});
+                }
+            });
+            //this.setState({loading: 'troggers'});
+            alert('done');
+        }).catch(err => {
+            console.log('Error getting document', err);
+        });
+
+
+        //alert('loading');
+
+    }
+
+    componentWillUnmount() {
+        this.setState({loading: 'false'});
+        alert('done');
+    }
+
     replyToPost() {
         alert("REPLY!")
     }
 
-    readSinglePost() {
+    readSinglePost(id, data) {
+        alert(id);
+        alert(data);
+        return (
+            <ListItem style={postedBox}>
+                <div style={{marginBottom: "70px"}}>
+                    <AccountTag></AccountTag>
+                    <div id="outputPost" style={outputPost}>
+                        {data}
+                    </div>
+                    <div style={footerGroup}>
 
+                        <div style={footerText} ><img style={footerImages} src={interested_svg} alt="star"/> Interested</div>
+                        <button onClick={this.replyToPost} style={footerText}><img style={footerImages} src={reply_svg} alt="reply"/> Reply</button>
+                        <div style={footerText}><img style={footerImages} src={share_svg} alt="reply"/> Share</div>
+
+
+                    </div>
+                </div>
+            </ListItem>
+        )
     }
 
     readPosts() {
-        var items = [];
-        this.props.db.collection("category").doc(this.state.category).collection(this.state.channel).get().then(function(querySnapshot) {
-            querySnapshot.forEach(function(doc) {
-                // doc.data() is never undefined for query doc snapshots
-                //console.log(doc.id, " => ", doc.data());
-                items.push([doc.id, doc.data()]);
-            });
-        });
-        console.log(items);
-
         return (
-            <List>
-                {items.map(({id, data}) => (
-                    <ListItem style={postedBox}>
-                        <div style={{marginBottom: "70px"}}>
-                            <AccountTag></AccountTag>
-                            <div id="outputPost" style={outputPost}>
-                                {data}
-                            </div>
-                            <div style={footerGroup}>
-
-                                <div style={footerText} ><img style={footerImages} src={interested_svg} alt="star"/> Interested</div>
-                                <button onClick={this.replyToPost} style={footerText}><img style={footerImages} src={reply_svg} alt="reply"/> Reply</button>
-                                <div style={footerText}><img style={footerImages} src={share_svg} alt="reply"/> Share</div>
-
-
-                            </div>
-                        </div>
-                    </ListItem>
+            /*<List>
+                {items2.map(({id, data}) => (
+                    this.readSinglePost(id, data)
                 ))}
-            </List>
+            </List>*/
+            <div>{this.state.message}</div>
         );
     }
 
     readBody() {
-        const { items } = this.state;
+        //const { items } = this.state;
         return(
             <div>
 
@@ -189,7 +220,7 @@ class FeedBody extends Component {
 
                     </Button>
                 </div>
-                {this.readPosts(items)}
+                {this.readPosts()}
             </div>
         );
     }
