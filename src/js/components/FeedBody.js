@@ -107,13 +107,7 @@ class FeedBody extends Component {
             //hardcoding posts for now
             category: 'music-festival',
             channel: 'edc-la-2019',
-            items: [
-                {id: uuid(), post: 'Hihihii', replies: {id: uuid(), reply: 'Byebyebye'}},
-                {id: uuid(), post: "raveraverave"},
-                {id: uuid(), post: 'travelfaaaaam'}
-            ],
-            message: 'log',
-            loading: 'dog'
+            items: []
         }
         this.readBody = this.readBody.bind(this);
         this.readPosts = this.readPosts.bind(this);
@@ -121,37 +115,21 @@ class FeedBody extends Component {
     }
 
     componentDidMount() {
-        this.setState({loading: 'true'});
 
         this.props.db.collection("category").doc(this.state.category).collection(this.state.channel).get().then(querySnapshot => {
-            if (querySnapshot) {
-                alert("dog");
-            } else {
-                alert("notdog");
-            }
+            var items = [];
             querySnapshot.forEach(doc => {
                 // doc.data() is never undefined for query doc snapshots
                 //console.log(doc.id, " => ", doc.data());
-                //items.push({id: doc.id, data: "hi"});
-                alert(doc.id);
-                if (this.state.loading == 'true') {
-                    this.setState({message: doc.id});
-                }
+                items.push({id: doc.id, data: doc.data()});
             });
-            //this.setState({loading: 'troggers'});
-            alert('done');
+            console.log(items);
+            this.setState({items: items});
         }).catch(err => {
             console.log('Error getting document', err);
         });
-
-
         //alert('loading');
 
-    }
-
-    componentWillUnmount() {
-        this.setState({loading: 'false'});
-        alert('done');
     }
 
     replyToPost() {
@@ -159,14 +137,12 @@ class FeedBody extends Component {
     }
 
     readSinglePost(id, data) {
-        alert(id);
-        alert(data);
         return (
             <ListItem style={postedBox}>
                 <div style={{marginBottom: "70px"}}>
                     <AccountTag></AccountTag>
                     <div id="outputPost" style={outputPost}>
-                        {data}
+                        {data.message}
                     </div>
                     <div style={footerGroup}>
 
@@ -182,14 +158,20 @@ class FeedBody extends Component {
     }
 
     readPosts() {
-        return (
-            /*<List>
-                {items2.map(({id, data}) => (
-                    this.readSinglePost(id, data)
-                ))}
-            </List>*/
-            <div>{this.state.message}</div>
-        );
+        if (this.state.items.length == 0) {
+            return (
+                <div>LOADING SPINNING CIRCLE</div>
+            );
+        } else {
+            return (
+                <List>
+                    {this.state.items.map(({id, data}) => (
+                        this.readSinglePost(id, data)
+                    ))}
+                </List>
+            )
+        }
+
     }
 
     readBody() {
@@ -208,12 +190,23 @@ class FeedBody extends Component {
                         //reset post area to nothing after posting
                         document.getElementById("inputPost").value="";
                         //if post had text, add new post to state
+                        var today = new Date();
+                        var currentDate = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+                        var currentTime = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
                         if (input !== '') {
-                            this.setState(state => ({
-                                items: [{id: uuid(), post: input}, ...state.items]
-                            }));
+                            this.props.db.collection("category").doc(this.state.category).collection(this.state.channel).add({
+                                id: '0RHvET4AUXlPGr3Ug921',
+                                message: input,
+                                replies: 0,
+                                date: currentDate,
+                                time: currentTime
+                            }).then(() => {
+                                console.log('added');
+                            }).catch(err => {
+                                console.log('Error getting document', err);
+                            });
+                            this.componentDidMount();
                         }
-
                     }}>
 
                         POST
