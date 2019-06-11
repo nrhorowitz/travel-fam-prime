@@ -113,36 +113,55 @@ class FeedBody extends Component {
         this.readBody = this.readBody.bind(this);
         this.readPosts = this.readPosts.bind(this);
         this.readSinglePost = this.readSinglePost.bind(this);
+        this.pullFromDatabase = this.pullFromDatabase.bind(this);
     }
 
     componentDidMount() {
+        this.pullFromDatabase("users", "");
+        this.pullFromDatabase("feed", this.state.category + "/" + this.state.channel);
+        this.pullFromDatabase("wrapperload", "");
+    }
 
-        this.props.db.collection("category").doc(this.state.category).collection(this.state.channel).get().then(querySnapshot => {
-            var items = [];
-            querySnapshot.forEach(doc => {
-                // doc.data() is never undefined for query doc snapshots
-                //console.log(doc.id, " => ", doc.data());
-                items.push({id: doc.id, data: doc.data()});
+    pullFromDatabase(content, prefixPath) {
+        if (content === "users") {
+            this.props.db.collection("users").get().then(querySnapshot => {
+                var userMap = new Map();
+                querySnapshot.forEach(doc => {
+                    // doc.data() is never undefined for query doc snapshots
+                    //console.log(doc.id, " => ", doc.data());
+                    userMap.set(doc.id, doc.data());
+                });
+                console.log(userMap);
+                this.setState({userMap: userMap});
+            }).catch(err => {
+                console.log('Error getting document', err);
             });
-            console.log(items);
-            this.setState({items: items});
-        }).catch(err => {
-            console.log('Error getting document', err);
-        });
-        this.props.db.collection("users").get().then(querySnapshot => {
-            var userMap = new Map();
-            querySnapshot.forEach(doc => {
-                // doc.data() is never undefined for query doc snapshots
-                //console.log(doc.id, " => ", doc.data());
-                userMap.set(doc.id, doc.data());
+        } else if (content === "feed") {
+            var currentRef = this.props.db.collection("category");
+            var pathArray = prefixPath.split("/");
+            for (var i = 0; i < pathArray.length; i += 2) {
+                currentRef = currentRef.doc(pathArray[i]);
+                currentRef = currentRef.collection(pathArray[i + 1]);
+            }
+            currentRef.get().then(querySnapshot => {
+                var items = [];
+                querySnapshot.forEach(doc => {
+                    // doc.data() is never undefined for query doc snapshots
+                    //console.log(doc.id, " => ", doc.data());
+                    items.push({id: doc.id, data: doc.data()});
+                });
+                console.log(items);
+                this.setState({items: items});
+            }).catch(err => {
+                console.log('Error getting document', err);
             });
-            console.log(userMap);
-            this.setState({userMap: userMap});
-        }).catch(err => {
-            console.log('Error getting document', err);
-        });
-        //alert('loading');
-
+        } else if (content === "wrapperload") {
+            this.props.db.collection("users").get().then(querySnapshot => {
+                console.log('loaded');
+            }).catch(err => {
+                console.log('Error getting document', err);
+            });
+        }
     }
 
     replyToPost() {
