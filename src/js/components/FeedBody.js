@@ -107,7 +107,8 @@ class FeedBody extends Component {
             //hardcoding posts for now
             category: 'music-festival',
             channel: 'edc-la-2019',
-            items: []
+            items: [],
+            userMap: []
         }
         this.readBody = this.readBody.bind(this);
         this.readPosts = this.readPosts.bind(this);
@@ -128,6 +129,18 @@ class FeedBody extends Component {
         }).catch(err => {
             console.log('Error getting document', err);
         });
+        this.props.db.collection("users").get().then(querySnapshot => {
+            var userMap = new Map();
+            querySnapshot.forEach(doc => {
+                // doc.data() is never undefined for query doc snapshots
+                //console.log(doc.id, " => ", doc.data());
+                userMap.set(doc.id, doc.data());
+            });
+            console.log(userMap);
+            this.setState({userMap: userMap});
+        }).catch(err => {
+            console.log('Error getting document', err);
+        });
         //alert('loading');
 
     }
@@ -136,28 +149,38 @@ class FeedBody extends Component {
         alert("REPLY!")
     }
 
+    readSinglePostRecursive(id, data) {
+
+    }
+
     readSinglePost(id, data) {
-        return (
-            <ListItem style={postedBox}>
-                <div style={{marginBottom: "70px"}}>
-                    <AccountTag></AccountTag>
-                    <div id="outputPost" style={outputPost}>
-                        {data.message}
+        if (id.length > 0) {
+            return (
+                <ListItem style={postedBox}>
+                    <div style={{marginBottom: "70px"}}>
+                        <AccountTag id={id} userMap={this.state.userMap}></AccountTag>
+                        <div id="outputPost" style={outputPost}>
+                            {data.message}
+                        </div>
+                        <div style={footerGroup}>
+                            <div style={footerText} ><img style={footerImages} src={interested_svg} alt="star"/> Interested</div>
+                            <button onClick={this.replyToPost} style={footerText}><img style={footerImages} src={reply_svg} alt="reply"/> Reply</button>
+                            <div style={footerText}><img style={footerImages} src={share_svg} alt="reply"/> Share</div>
+                        </div>
+
                     </div>
-                    <div style={footerGroup}>
+                </ListItem>
+            )
+        } else {
+            return (
+                <div></div>
+            )
+        }
 
-                        <div style={footerText} ><img style={footerImages} src={interested_svg} alt="star"/> Interested</div>
-                        <button onClick={this.replyToPost} style={footerText}><img style={footerImages} src={reply_svg} alt="reply"/> Reply</button>
-                        <div style={footerText}><img style={footerImages} src={share_svg} alt="reply"/> Share</div>
-
-
-                    </div>
-                </div>
-            </ListItem>
-        )
     }
 
     readPosts() {
+        console.log(this.state.items);
         if (this.state.items.length == 0) {
             return (
                 <div>LOADING SPINNING CIRCLE</div>
@@ -166,7 +189,7 @@ class FeedBody extends Component {
             return (
                 <List>
                     {this.state.items.map(({id, data}) => (
-                        this.readSinglePost(id, data)
+                        this.readSinglePost(data.id, data)
                     ))}
                 </List>
             )

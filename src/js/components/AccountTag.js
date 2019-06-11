@@ -51,8 +51,17 @@ const useStyles = makeStyles(theme => ({
 
 }));
 
-export default function AccountTag() {
+export default function AccountTag(props) {
     const classes = useStyles();
+    var name = "";
+    if ((props.userMap !== undefined) && (props.userMap.get !== undefined) && (props.userMap.get(props.id) !== undefined)) {
+        var map = props.userMap.get(props.id);
+        if ((map.firstName !== undefined) && (map.lastName !== undefined)) {
+            name = map.firstName + " " + map.lastName;
+        }
+    } else {
+
+    }
     return (
         <div>
             <div style={{alignItems: "center", marginBottom: "30px"}}>
@@ -65,7 +74,7 @@ export default function AccountTag() {
                 </div>
 
                 <div style={{marginLeft: "60px", paddingTop: "5px"}}>
-                    <div className={classes.profileName}>TravelFam</div>
+                    <div className={classes.profileName}>{name}</div>
                     <div className={classes.profileLocation}>Berkeley, CA</div>
                 </div>
 
