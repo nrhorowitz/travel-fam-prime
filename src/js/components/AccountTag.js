@@ -62,6 +62,10 @@ export default function AccountTag(props) {
     } else {
 
     }
+    var time = ""; //TODO: RELATIVE TIMING
+    if ((props.data !== undefined) && (props.data.date !== undefined) && (props.data.time !== undefined)) {
+        time = "Berkeley, CA - " + props.data.date + " " + props.data.time;
+    }
     return (
         <div>
             <div style={{alignItems: "center", marginBottom: "30px"}}>
@@ -75,7 +79,7 @@ export default function AccountTag(props) {
 
                 <div style={{marginLeft: "60px", paddingTop: "5px"}}>
                     <div className={classes.profileName}>{name}</div>
-                    <div className={classes.profileLocation}>Berkeley, CA</div>
+                    <div className={classes.profileLocation}>{time}</div>
                 </div>
 
             </div>
