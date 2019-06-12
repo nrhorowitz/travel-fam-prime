@@ -113,16 +113,17 @@ class FeedBody extends Component {
         this.readBody = this.readBody.bind(this);
         this.readPosts = this.readPosts.bind(this);
         this.readSinglePost = this.readSinglePost.bind(this);
+        this.readSinglePostRecursive = this.readSinglePostRecursive.bind(this);
         this.pullFromDatabase = this.pullFromDatabase.bind(this);
     }
 
     componentDidMount() {
-        this.pullFromDatabase("users", "");
-        this.pullFromDatabase("feed", this.state.category + "/" + this.state.channel);
-        this.pullFromDatabase("wrapperload", "");
+        this.pullFromDatabase([], "users", "");
+        this.pullFromDatabase([], "feed", this.state.category + "/" + this.state.channel);
+        this.pullFromDatabase([], "wrapperload", "");
     }
 
-    pullFromDatabase(content, prefixPath) {
+    pullFromDatabase(items, content, prefixPath) {
         if (content === "users") {
             this.props.db.collection("users").get().then(querySnapshot => {
                 var userMap = new Map();
@@ -139,19 +140,37 @@ class FeedBody extends Component {
         } else if (content === "feed") {
             var currentRef = this.props.db.collection("category");
             var pathArray = prefixPath.split("/");
+            var itemsRef = this.state;
             for (var i = 0; i < pathArray.length; i += 2) {
                 currentRef = currentRef.doc(pathArray[i]);
                 currentRef = currentRef.collection(pathArray[i + 1]);
+                if (itemsRef.items === undefined) {
+                    for (var j = 0; j < itemsRef.length; j += 1) {
+                        if (itemsRef[j].id === pathArray[i]) {
+                            console.log(itemsRef);
+                            itemsRef = itemsRef[j].data;
+                            console.log(itemsRef);
+                            break;
+                        }
+                    }
+                    itemsRef.items = [];
+                    console.log(itemsRef);
+                }
+                itemsRef = itemsRef.items;
             }
+            console.log(itemsRef);
             currentRef.get().then(querySnapshot => {
-                var items = [];
                 querySnapshot.forEach(doc => {
                     // doc.data() is never undefined for query doc snapshots
                     //console.log(doc.id, " => ", doc.data());
-                    items.push({id: doc.id, data: doc.data()});
+                    itemsRef.push({id: doc.id, data: doc.data()}); //timestamp is the max time of all elements in tree - deleting new reply will cause post to go back down
+
+                    if ((doc.data().replies > 0) && (true)) {
+                        this.pullFromDatabase(doc.data(), "feed", this.state.category + "/" + this.state.channel + "/" + doc.id + "/reply");
+                    }
                 });
-                console.log(items);
-                this.setState({items: items});
+                console.log(this.state.items);
+                this.setState({items: this.state.items});
             }).catch(err => {
                 console.log('Error getting document', err);
             });
@@ -169,33 +188,47 @@ class FeedBody extends Component {
     }
 
     readSinglePostRecursive(id, data) {
-
-    }
-
-    readSinglePost(id, data) {
-        if (id.length > 0) {
+        if (data !== undefined) {
+            console.log(data);
             return (
-                <ListItem style={postedBox}>
-                    <div style={{marginBottom: "70px"}}>
-                        <AccountTag id={id} userMap={this.state.userMap}></AccountTag>
-                        <div id="outputPost" style={outputPost}>
-                            {data.message}
-                        </div>
-                        <div style={footerGroup}>
-                            <div style={footerText} ><img style={footerImages} src={interested_svg} alt="star"/> Interested</div>
-                            <button onClick={this.replyToPost} style={footerText}><img style={footerImages} src={reply_svg} alt="reply"/> Reply</button>
-                            <div style={footerText}><img style={footerImages} src={share_svg} alt="reply"/> Share</div>
-                        </div>
-
-                    </div>
-                </ListItem>
+                <List>
+                    {data.map(({id, data}) => (
+                        this.readSinglePost(data.id, data)
+                    ))}
+                </List>
             )
         } else {
             return (
-                <div></div>
+                <div>
+                </div>
             )
         }
+    }
 
+    readSinglePost(id, data) {
+        var replyString = "";
+        if (data.replies === 0) {
+            replyString = " Comment";
+        } else {
+            replyString = " " + data.replies + " Comments";
+        }
+        console.log(data);
+        return (
+            <ListItem style={postedBox}>
+                <div style={{marginBottom: "70px"}}>
+                    <AccountTag id={id} userMap={this.state.userMap}></AccountTag>
+                    <div id="outputPost" style={outputPost}>
+                        {data.message}
+                    </div>
+                    <div style={footerGroup}>
+                        <div style={footerText} ><img style={footerImages} src={interested_svg} alt="star"/> Interested</div>
+                        <button onClick={this.replyToPost} style={footerText}><img style={footerImages} src={reply_svg} alt="reply"/>{replyString}</button>
+                        <div style={footerText}><img style={footerImages} src={share_svg} alt="reply"/> Share</div>
+                    </div>
+                    {this.readSinglePostRecursive(id, data.items)}
+                </div>
+            </ListItem>
+        )
     }
 
     readPosts() {
