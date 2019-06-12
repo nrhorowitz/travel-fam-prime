@@ -16,7 +16,6 @@ import SignUpView from './SignUpView';
 import firebase from 'firebase';
 import 'firebase/auth';
 
-
 const db = firebase.firestore();
 
 class App extends Component {
