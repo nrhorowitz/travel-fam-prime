@@ -26,8 +26,19 @@ firebase.auth().useDeviceLanguage();
 
 // firebase.auth().settings.appVerificationDisabledForTesting = true;
 const logo = require('../img/Logo3.png');
+const backArrow = require('../img/back.svg');
 const fsParentDiv = {
   paddingTop: "80px"
+}
+
+const backArrowStyle = {
+  width: "40px",
+  height: "40px",
+}
+const backArrowButtonStyle = {
+  border: "none",
+  outline: "none",
+  padding: "0"
 }
 const logoStyle = {
   width: "150px",
@@ -304,7 +315,9 @@ class SignUpView extends Component {
     if (fieldsetStep == 1){
       return(
         <div style={fsParentDiv}>
+          
           <fieldset id="phoneNumberStep" style={fieldsetStyle}>
+            
             <img src={logo} style={logoStyle} alt="logo"></img>
             <h1 style={headerOneStyle}>Please enter your phone number to continue</h1>
             {/* <TextField style={inputStyle} variant="outlined" type="tel" label="Phone Number" value={this.state.pNum} onChange={this.handleChange} /> */}
@@ -319,6 +332,7 @@ class SignUpView extends Component {
         <div style={fsParentDiv}>
         {/* smsCodeStep fieldset is hidden right now */}
         <fieldset id="congratsStep" style={congratsStepStyle}>
+          <button style={backArrowButtonStyle}><img src={backArrow} style={backArrowStyle} alt="backArrow" /></button>
           <h1 style={headerTwoStyle}>Congrats! You've been invited to TravelFam</h1>
           <p style={pStyle}>TravelFam is an invitation only private network of verified travelers. Your account is ready to be set up</p>
           <Button style={buttonStyle} variant="contained" color="secondary" type="submit" onClick={this.onSignUpSubmit}>Sign Up Now</Button>
@@ -328,6 +342,7 @@ class SignUpView extends Component {
         {/* congratsStep fieldset gets hidden, smsCodeStep fieldstep gets shown */}
         {/* TODO: minor error: uncaught promise timeout happens because this fieldset gets removed. i think */}
         <fieldset id="smsCodeStep" style={smsStepStyle}>
+          <button style={backArrowButtonStyle}><img src={backArrow} style={backArrowStyle} alt="backArrow" /></button>
           <h1 style={headerTwoStyle} id="phoneNumPrompt"></h1>
           
           <TextField style={inputStyle} variant="outlined" label="SMS Code" value={this.state.smsCode} onChange={this.handleCodeChange} />
@@ -338,8 +353,11 @@ class SignUpView extends Component {
 
     } else if (fieldsetStep == 3) {
       return(
+        
         <div style={fsParentDiv}>
+          
           <fieldset id="nameStep" style={fieldsetStyle}>
+            <button style={backArrowButtonStyle}><img src={backArrow} style={backArrowStyle} alt="backArrow" /></button>
             <h1 style={headerOneStyle}>What's your name?</h1>
             <TextField style={inputStyle} variant="outlined" label="First Name" value={this.state.firstName} onChange={this.handleFirstNameChange} />
             <TextField style={inputStyle} variant="outlined" label="Last Name" value={this.state.lastName} onChange={this.handleLastNameChange} />
@@ -352,6 +370,7 @@ class SignUpView extends Component {
       return(
         <div style={fsParentDiv}>
           <fieldset id="emailStep" style={fieldsetStyle}>
+            <button style={backArrowButtonStyle}><img src={backArrow} style={backArrowStyle} alt="backArrow" /></button>
             <h1 style={headerOneStyle}>So that we can contact you. What's your email?</h1>
             
             <TextField style={inputStyle} variant="outlined" label="email" value={this.state.email} onChange={this.handleEmailChange} />
@@ -363,6 +382,7 @@ class SignUpView extends Component {
       return(
         <div style={fsParentDiv}>
           <fieldset id="passwordStep" style={fieldsetStyle}>
+            <button style={backArrowButtonStyle}><img src={backArrow} style={backArrowStyle} alt="backArrow" /></button>
             <h1 style={headerThreeStyle}>Last step...Create a password</h1>
             
             <TextField style={inputStyle} variant="outlined" label="Password" value={this.state.password} onChange={this.handlePasswordChange} />
