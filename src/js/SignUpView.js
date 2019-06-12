@@ -4,6 +4,9 @@ import 'firebase/auth';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import DashBoardView from './DashBoardView.js';
+import PhoneInput from 'react-phone-number-input';
+// import 'react-phone-number-input/react-responsive-ui';
+import 'react-phone-number-input/style.css'
 
 //Initializing firebase with sms-verification database
 firebase.initializeApp({
@@ -304,7 +307,9 @@ class SignUpView extends Component {
           <fieldset id="phoneNumberStep" style={fieldsetStyle}>
             <img src={logo} style={logoStyle} alt="logo"></img>
             <h1 style={headerOneStyle}>Please enter your phone number to continue</h1>
-            <TextField style={inputStyle} variant="outlined" type="tel" label="Phone Number" value={this.state.pNum} onChange={this.handleChange} />
+            {/* <TextField style={inputStyle} variant="outlined" type="tel" label="Phone Number" value={this.state.pNum} onChange={this.handleChange} /> */}
+            <PhoneInput country="US" style={inputStyle} placeholder="Enter phone number" value={this.state.pNum} onChange={pNum => this.setState({pNum})}></PhoneInput>
+            
             <Button style={buttonStyle} variant="contained" color="secondary" onClick={this.handleStepChange}>Next</Button>
           </fieldset>
         </div>
@@ -324,6 +329,7 @@ class SignUpView extends Component {
         {/* TODO: minor error: uncaught promise timeout happens because this fieldset gets removed. i think */}
         <fieldset id="smsCodeStep" style={smsStepStyle}>
           <h1 style={headerTwoStyle} id="phoneNumPrompt"></h1>
+          
           <TextField style={inputStyle} variant="outlined" label="SMS Code" value={this.state.smsCode} onChange={this.handleCodeChange} />
           <Button style={buttonStyle} variant="contained" color="secondary" type="submit" onClick={() => {this.verify(); this.handleStepChange()}} id="recaptchaContainer">Verify</Button>
         </fieldset>
