@@ -35,10 +35,10 @@ class App extends Component {
 
     componentDidMount() {
         
-        // this.segueToView("LandingPageView");
+        this.segueToView("LandingPageView");
         // this.segueToView("DashBoardView");
         //this.segueToView("SMSVerificationView");
-        this.segueToView("SignUpView");
+        // this.segueToView("SignUpView");
     }
 
     // componentWillUnmount() {
