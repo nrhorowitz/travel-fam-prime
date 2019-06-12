@@ -1,7 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import firebase from "firebase"
 
-import SignIn from '../components/SignIn.js';
+import SignUpView from './SignUpView';
 
 class LandingPageView extends React.Component {
     constructor(props) {
@@ -11,7 +12,7 @@ class LandingPageView extends React.Component {
     render() {
         return (
             <div>
-                <SignIn
+                <SignUpView
                     handlePhoneEntry = {this.props.handlePhoneEntry}
                 />
             </div>

@@ -12,11 +12,10 @@ import CreateNameView from './CreateNameView.js';
 import CreateEmailView from './CreateEmailView.js';
 import CreatePasswordView from './CreatePasswordView.js';
 import LoadingPageView from './LoadingPageView.js';
-
+import SignUpView from './SignUpView';
 import firebase from 'firebase';
 import 'firebase/auth';
-import {reduxFirestore, getFirestore} from 'redux-firestore';
-import {reactReduxFirebase, getFirebase} from 'react-redux-firebase';
+
 
 const db = firebase.firestore();
 
@@ -36,22 +35,16 @@ class App extends Component {
     }
 
     componentDidMount() {
-        this.listener = firebase.auth().onAuthStateChanged(
-            authUser => {
-                firebase.auth().currentUser = authUser;
-                this.setState({currentUserId: authUser.uid})
-                this.updateViewToId();
-                return;
-            },
-        );
-        //this.segueToView("LandingPageView");
-        this.segueToView("DashBoardView");
+        
+        // this.segueToView("LandingPageView");
+        // this.segueToView("DashBoardView");
         //this.segueToView("SMSVerificationView");
+        this.segueToView("SignUpView");
     }
 
-    componentWillUnmount() {
-        this.listener();
-    }
+    // componentWillUnmount() {
+    //     this.listener();
+    // }
 
     segueToView(direction) {
         this.setState({currentView: direction});
@@ -122,7 +115,15 @@ class App extends Component {
                     handlePhoneEntry = {this.handlePhoneEntry}
                 />
             )
-        } else if (this.state.currentView === "EditProfileView") {
+        } else if (this.state.currentView === "SignUpView") {
+            return (
+                <SignUpView segueToView = {this.segueToView}>
+                    segueToView = {this.segueToView}
+                </SignUpView>
+            )
+        }
+        
+        else if (this.state.currentView === "EditProfileView") {
             return (
                 <EditProfileView
                     segueToView = {this.segueToView}
