@@ -15,6 +15,7 @@ import LoadingPageView from './LoadingPageView.js';
 import SignUpView from './SignUpView';
 import firebase from 'firebase';
 import 'firebase/auth';
+import ProfileView from './ProfileView.js';
 
 const db = firebase.firestore();
 
@@ -28,6 +29,7 @@ class App extends Component {
         this.segueToView = this.segueToView.bind(this);
         this.addNewUserInfo = this.addNewUserInfo.bind(this);
         this.setNewUser = this.setNewUser.bind(this);
+        this.setNewCredential = this.setNewCredential.bind(this);
         this.existingUser = this.existingUser.bind(this);
         this.handlePhoneEntry = this.handlePhoneEntry.bind(this);
         this.updateViewToId = this.updateViewToId.bind(this);
@@ -35,10 +37,11 @@ class App extends Component {
 
     componentDidMount() {
         
-        this.segueToView("LandingPageView");
+        // this.segueToView("LandingPageView");
         // this.segueToView("DashBoardView");
         //this.segueToView("SMSVerificationView");
-        // this.segueToView("SignUpView");
+        this.segueToView("SignUpView");
+        // this.segueToView("ProfileView");
     }
 
     // componentWillUnmount() {
@@ -61,17 +64,59 @@ class App extends Component {
         });
     }
 
-    setNewUser(user) {
-        alert(firebase.currentUser);
-        console.log(user);
+    setNewUser(user, credential, email, firstName, lastName) {
+        // alert(firebase.currentUser);
+        console.log("setnewuser's credential here")
+        console.log(credential);
+        console.log(user.password);
+
+        var jsonCredential = JSON.stringify(credential);
+        console.log("this is user uid", user.uid);
         this.setState({currentUserId: user.uid});
-        db.collection('users').doc(this.state.currentUserId).set({
-            "phone": user.phoneNumber,
+        //erroring because user id is null when called 
+        //for some reason this.state.currenUserId is null even when setting it in line 75 ???
+        console.log(this.state.currentUserId);
+        db.collection('users').doc(user.uid).set({
+            phone: user.phoneNumber,
+            email: email,
+            firstName: firstName,
+            lastName: lastName
+            
             //"credential": user.c
         }).catch(function(error) {
             console.error("Error writing document: ", error);
         });
+
+
+        // db.collection('credentials').doc(this.state.currentUserId).set({
+        //     credential: jsonCredential,
+        //     // password: user.password
+        // }).catch(function(error) {
+        //     console.error("Error storing credential and password: ", error);
+        // })
+
+
+
+        this.setNewCredential(user, jsonCredential);
     }
+
+    setNewCredential(user, jsonCred) {
+        console.log("SETNEWTNOIW JSONCRED");
+        console.log(jsonCred);
+        
+        //when reading credential from firebase, need to use JSON.parse(credential) to unparse it from JSON format
+        
+        // const cred = credential.map((obj) => {return Object.assign({}, obj)});
+        db.collection('credentials').doc(user.uid).set({
+            credential: jsonCred,
+            password: user.password
+            
+            
+        }).catch(function(error) {
+            console.error("Error storing credential and password: ", error);
+        })
+    }
+
 
     existingUser(phone) {
         db.collection('users').get().then((snapshot) => {
@@ -108,6 +153,13 @@ class App extends Component {
     }
 
     currentPage() {
+        if (this.state.currentView === "ProfileView") {
+            return (
+                <ProfileView segueToView = {this.segueToView}>
+                    
+                </ProfileView>
+            )
+        }
         if (this.state.currentView === "LandingPageView") {
             return (
                 <LandingPageView
@@ -116,8 +168,13 @@ class App extends Component {
             )
         } else if (this.state.currentView === "SignUpView") {
             return (
-                <SignUpView segueToView = {this.segueToView}>
+                <SignUpView 
                     segueToView = {this.segueToView}
+                    setNewUser = {this.setNewUser}
+                    firebase = {firebase}
+                    addNewUserInfo = {this.addNewUserInfo}
+                >
+                    
                 </SignUpView>
             )
         }
