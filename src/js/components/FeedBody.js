@@ -3,13 +3,10 @@ import Button from '@material-ui/core/Button';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import AccountTag from './AccountTag';
+import TextField from '@material-ui/core/TextField';
 import uuid from 'uuid';
 import { textAlign } from '@material-ui/system';
 
-const hSeparator = {
-    borderColor: "#C4C4C4",
-    opacity: "0.2"
-}
 const postBox = {
     backgroundColor: "#FFFFFF",
     borderRadius: "20px",
@@ -30,12 +27,12 @@ const postArea = {
     outline: "none"
 }
 const postButton = {
-    backgroundColor: "#FD6D6E",
-    // borderRadius: "5px",
+    //backgroundColor: "#FD6D6E",
+    borderRadius: "5px",
     marginBottom: "10px",
-    height: "30px",
+    //height: "30px",
     color: "#FFFFFF",
-    fontSize: "12px",
+    fontSize: "16px",
     float: "right",
     marginTop:"0px",
 }
@@ -54,12 +51,13 @@ const emptyFeed = {
 }
 const postedBox = {
     backgroundColor: "#FFFFFF",
-    borderRadius: "20px",
+    borderRadius: "15px",
     // boxShadow: "0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 2px 4px 0 rgba(0, 0, 0, 0.2)",
     marginTop: "30px",
     minHeight: "20vh",
     display: "flex",
-    position: "relative"
+    position: "relative",
+    borderLeft: "15px solid red"
     // borderStyle: "solid",
     // borderWidth: "1px",
     // borderColor: "#FD6D6E"
@@ -216,7 +214,7 @@ class FeedBody extends Component {
         return (
             <ListItem style={postedBox}>
                 <div style={{marginBottom: "70px"}}>
-                    <AccountTag id={id} userMap={this.state.userMap}></AccountTag>
+                    <AccountTag id={id} userMap={this.state.userMap} data={data}></AccountTag>
                     <div id="outputPost" style={outputPost}>
                         {data.message}
                     </div>
@@ -256,8 +254,7 @@ class FeedBody extends Component {
 
                 {/* Make a post textarea */}
                 <div style={postBox}>
-                    <textarea id="inputPost" style={postArea} placeholder="Type Message..."></textarea>
-                    <hr style={hSeparator}></hr>
+                    <TextField id="inputPost" style={postArea} label="CREATE POST" rows="5" multiline></TextField>
 
                     {/* Post Button */}
                     <Button style={postButton} variant="contained" color="secondary" onClick={() => {
@@ -280,6 +277,7 @@ class FeedBody extends Component {
                             }).catch(err => {
                                 console.log('Error getting document', err);
                             });
+                            //this.setState({items: []});
                             this.componentDidMount();
                         }
                     }}>
