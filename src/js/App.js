@@ -36,20 +36,12 @@ class App extends Component {
     }
 
     componentDidMount() {
-<<<<<<< HEAD
 
-        //this.segueToView("LandingPageView");
+        // this.segueToView("LandingPageView");
         this.segueToView("DashBoardView");
         //this.segueToView("SMSVerificationView");
-        //this.segueToView("SignUpView");
-=======
-        
-        // this.segueToView("LandingPageView");
-        // this.segueToView("DashBoardView");
-        //this.segueToView("SMSVerificationView");
         // this.segueToView("SignUpView");
-        this.segueToView("ProfileView");
->>>>>>> d1669168e5680c7023cfdfd26ff210419e97798f
+        //this.segueToView("ProfileView");
     }
 
     // componentWillUnmount() {
@@ -81,7 +73,7 @@ class App extends Component {
         var jsonCredential = JSON.stringify(credential);
         console.log("this is user uid", user.uid);
         this.setState({currentUserId: user.uid});
-        //erroring because user id is null when called 
+        //erroring because user id is null when called
         //for some reason this.state.currenUserId is null even when setting it in line 75 ???
         console.log(this.state.currentUserId);
         db.collection('users').doc(user.uid).set({
@@ -89,7 +81,7 @@ class App extends Component {
             email: email,
             firstName: firstName,
             lastName: lastName
-            
+
             //"credential": user.c
         }).catch(function(error) {
             console.error("Error writing document: ", error);
@@ -111,15 +103,15 @@ class App extends Component {
     setNewCredential(user, jsonCred) {
         console.log("SETNEWTNOIW JSONCRED");
         console.log(jsonCred);
-        
+
         //when reading credential from firebase, need to use JSON.parse(credential) to unparse it from JSON format
-        
+
         // const cred = credential.map((obj) => {return Object.assign({}, obj)});
         db.collection('credentials').doc(user.uid).set({
             credential: jsonCred,
             password: user.password
-            
-            
+
+
         }).catch(function(error) {
             console.error("Error storing credential and password: ", error);
         })
@@ -164,7 +156,7 @@ class App extends Component {
         if (this.state.currentView === "ProfileView") {
             return (
                 <ProfileView segueToView = {this.segueToView}>
-                    
+
                 </ProfileView>
             )
         }
@@ -176,13 +168,13 @@ class App extends Component {
             )
         } else if (this.state.currentView === "SignUpView") {
             return (
-                <SignUpView 
+                <SignUpView
                     segueToView = {this.segueToView}
                     setNewUser = {this.setNewUser}
                     firebase = {firebase}
                     addNewUserInfo = {this.addNewUserInfo}
                 >
-                    
+
                 </SignUpView>
             )
         }

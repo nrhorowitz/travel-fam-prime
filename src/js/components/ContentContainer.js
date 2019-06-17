@@ -53,6 +53,10 @@ const useStyles = makeStyles(theme => ({
 
 }));
 
+function refreshData() {
+    alert('refresh');
+}
+
 export default function ContentContainer(props) {
     const classes = useStyles();
     return (

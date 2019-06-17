@@ -49,6 +49,7 @@ class DashBoardView extends React.Component {
 
     changeChannel(channel) {
         //TODO: REMEMBER IN USER TOKEN
+        console.log('reload');
         this.setState({channel: channel});
         this.pullFromDatabase();
     }
