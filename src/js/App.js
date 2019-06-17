@@ -34,11 +34,11 @@ class App extends Component {
     }
 
     componentDidMount() {
-        
-        this.segueToView("LandingPageView");
-        // this.segueToView("DashBoardView");
+
+        //this.segueToView("LandingPageView");
+        this.segueToView("DashBoardView");
         //this.segueToView("SMSVerificationView");
-        // this.segueToView("SignUpView");
+        //this.segueToView("SignUpView");
     }
 
     // componentWillUnmount() {
@@ -121,7 +121,7 @@ class App extends Component {
                 </SignUpView>
             )
         }
-        
+
         else if (this.state.currentView === "EditProfileView") {
             return (
                 <EditProfileView

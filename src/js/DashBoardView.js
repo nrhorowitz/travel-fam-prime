@@ -9,8 +9,21 @@ import '../css/App.css';
 class DashBoardView extends React.Component {
     constructor(props) {
         super(props);
+        this.state = {
+            //hardcoding posts for now
+            category: 'music-festival',
+            channel: 'edc-la-2019',
+            channelMap: 'None',
+        }
         this.changePage = this.changePage.bind(this);
         this.createNewButton = this.createNewButton.bind(this);
+        this.pullFromDatabase = this.pullFromDatabase.bind(this);
+        this.changeCategory = this.changeCategory.bind(this);
+        this.changeChannel = this.changeChannel.bind(this);
+    }
+
+    componentDidMount() {
+        this.pullFromDatabase();
     }
 
     changePage(direction) {
@@ -29,21 +42,54 @@ class DashBoardView extends React.Component {
         );
     }
 
+    changeCategory(category) {
+        //TODO: REMEMBER IN USER TOKEN
+        this.setState({category: category});
+    }
+
+    changeChannel(channel) {
+        //TODO: REMEMBER IN USER TOKEN
+        this.setState({channel: channel});
+        this.pullFromDatabase();
+    }
+
+    pullFromDatabase() {
+        this.props.db.collection("category").get().then(querySnapshot => {
+            var channelMap = new Map();
+            querySnapshot.forEach(doc => {
+                // TODO: insert sort by alphanumeric??
+                var category = doc.id;
+                var channels = doc.data().channels;
+                channelMap.set(category, channels);
+            });
+            this.setState({channelMap: channelMap});
+        }).catch(err => {
+            console.log('Error getting document', err);
+        });
+    }
+
     render() {
-
-        return(
-            <div>
-                {/* DashBoardView
-                {this.createNewButton("EDIT PROFILE", "EditProfileView")} */}
-
-                <AppNavBar></AppNavBar>
-
-                <ContentContainer
-                    db = {this.props.db}
-                ></ContentContainer>
-
-            </div>
-        )
+        if (this.state.channelMap === 'None') {
+            return (
+                <div>
+                    TODO: SPINNING CIRCLE
+                </div>
+            )
+        } else {
+            return(
+                <div>
+                    <AppNavBar></AppNavBar>
+                    <ContentContainer
+                        db = {this.props.db}
+                        category = {this.state.category}
+                        channel = {this.state.channel}
+                        channelMap = {this.state.channelMap}
+                        changeCategory = {this.changeCategory}
+                        changeChannel = {this.changeChannel}
+                    ></ContentContainer>
+                </div>
+            )
+        }
     }
 }
 
