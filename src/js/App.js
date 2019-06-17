@@ -40,8 +40,8 @@ class App extends Component {
         // this.segueToView("LandingPageView");
         // this.segueToView("DashBoardView");
         //this.segueToView("SMSVerificationView");
-        this.segueToView("SignUpView");
-        // this.segueToView("ProfileView");
+        // this.segueToView("SignUpView");
+        this.segueToView("ProfileView");
     }
 
     // componentWillUnmount() {

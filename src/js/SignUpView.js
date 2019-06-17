@@ -276,19 +276,7 @@ class SignUpView extends Component {
   render(){
     const congratsStepStyle = this.state.hideCongrats ? {
       display: 'none',
-      background: "rgba(0,0,0,0)",
-    
-      border: "0 none",
-      borderRadius: "10px",
-      boxShadow: "0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 6px 10px 0 rgba(0, 0, 0, 0.19)",
-      padding: "20px 30px",
-      boxSizing: "border-box",
       
-      margin: "auto",
-      position: "relative",
-    
-      width: "350px",
-      height: "600px",
     } : {
       
       background: "rgba(0,0,0,0)",
@@ -307,19 +295,7 @@ class SignUpView extends Component {
     };
     const smsStepStyle = this.state.hideSMS ? {
       display: 'none',
-      background: "rgba(0,0,0,0)",
-    
-      border: "0 none",
-      borderRadius: "10px",
-      boxShadow: "0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 6px 10px 0 rgba(0, 0, 0, 0.19)",
-      padding: "20px 30px",
-      boxSizing: "border-box",
       
-      margin: "auto",
-      position: "relative",
-    
-      width: "350px",
-      height: "600px",
     } : {
       
       background: "rgba(0,0,0,0)",
