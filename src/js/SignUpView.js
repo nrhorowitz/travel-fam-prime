@@ -8,6 +8,7 @@ import PhoneInput from 'react-phone-number-input';
 // import 'react-phone-number-input/react-responsive-ui';
 import 'react-phone-number-input/style.css'
 
+var globalProps = "";
 //Initializing firebase with sms-verification database
 firebase.initializeApp({
   apiKey: "AIzaSyAtrvGB8pwYWmyRwG02svHpAkh5QWzh9yk",
@@ -28,7 +29,8 @@ firebase.auth().useDeviceLanguage();
 const logo = require('../img/Logo3.png');
 const backArrow = require('../img/back.svg');
 const fsParentDiv = {
-  paddingTop: "80px"
+  paddingTop: "80px",
+  paddingBottom: "80px"
 }
 
 const backArrowStyle = {
@@ -110,11 +112,38 @@ const fieldsetStyle = {
 
 }
 
+var handleSignedInUser = function(user, credential, email, firstName, lastName) {
+  console.log("this is the user");
+  console.log(user);
+  console.log("this is the credential from handleSignedInUser");
+  console.log(credential);
+  globalProps.setNewUser(user, credential, email, firstName, lastName);
+  // console.log(firebase.currentUser); 
+  // console.log("ADNAKLALKSDNAKLDNLAKDNALKDASNKLALKNDALKD")
+  // console.log("just added to firebase");
+}
+
+var settingState = function(user, credential) {
+  this.setState({user: user});
+  this.setState({credential: credential});
+}
+
 
 class SignUpView extends Component { 
   constructor(props) {
     super(props);
-    this.state = {hideCongrats: false, hideSMS: false, step: 1, pNum: '', smsCode: '', firstName: '', lastName: '', email: '', password: ''};
+    globalProps = props;
+    this.state = {hideCongrats: false, 
+                  hideSMS: false, 
+                  step: 1, 
+                  pNum: '', 
+                  smsCode: '', 
+                  firstName: '', 
+                  lastName: '', 
+                  email: '', 
+                  password: '', 
+                  credential: '',
+                  user: ''};
     
     this.handleStepChange = this.handleStepChange.bind(this);
     this.handleChange = this.handleChange.bind(this);
@@ -141,7 +170,11 @@ class SignUpView extends Component {
       this.setState({hideCongrats: true});
       this.setState({hideSMS: false});
     } else if (step == 6) {
-      //GO TO DASHBOARD VIEW HERE
+      var user = this.state.user;
+      var credential = this.state.credential; 
+      user.password = this.state.password;
+
+      handleSignedInUser(user, credential, this.state.email, this.state.firstName, this.state.lastName);
     }
 
     this.setState({step: step});
@@ -179,6 +212,9 @@ class SignUpView extends Component {
     event.preventDefault();
   }
 
+  
+
+
   //initializes recaptcha and sends sms to phone number
   onSignUpSubmit() {
     
@@ -195,62 +231,52 @@ class SignUpView extends Component {
 
         //sets confirmationResult to global variable so you can access it in verify()
         window.confirmationResult = confirmationResult;
-        
-        
+        console.log("this is the confimanrasrnaalr");
+        console.log(confirmationResult);
       })
       .catch(function(error) {
         console.log("Error: sms not sent" + error); 
       })
-      
-      
   }
 
   //verifies inputted sms code and outputs user credential into console
   verify() {
     const confirmationResult = window.confirmationResult;
     var smsCode = this.state.smsCode;
+ 
+
     if (smsCode) {
 
       //this creates a credential even if the user doesn't sign in correctly. 
 
-      
-
+      console.log("this is confirmationRESULT")
+      console.log(confirmationResult);
       //signs the user in with the smsCode.
       confirmationResult.confirm(smsCode).then(function (result) {
         console.log("Successful login!")
         var credential = firebase.auth.PhoneAuthProvider.credential(confirmationResult.verificationId, smsCode); 
         console.log(credential);
         var user = result.user;
-        console.log(user);
+      
+        //user and credential are being updated to state here
+        this.setState({credential: credential});
+        this.setState({user: user});
         
-        
-      }).catch(function (error) {
+      }.bind(this)).catch(function (error) {
         console.log('Error while checking the verification code', error);
 
         //if user is not able to sign in correctly, need to null the credential created because it is the wrong credential 
           
       });
     }
-    
+
   }
   
 
   render(){
     const congratsStepStyle = this.state.hideCongrats ? {
       display: 'none',
-      background: "rgba(0,0,0,0)",
-    
-      border: "0 none",
-      borderRadius: "10px",
-      boxShadow: "0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 6px 10px 0 rgba(0, 0, 0, 0.19)",
-      padding: "20px 30px",
-      boxSizing: "border-box",
       
-      margin: "auto",
-      position: "relative",
-    
-      width: "350px",
-      height: "600px",
     } : {
       
       background: "rgba(0,0,0,0)",
@@ -269,19 +295,7 @@ class SignUpView extends Component {
     };
     const smsStepStyle = this.state.hideSMS ? {
       display: 'none',
-      background: "rgba(0,0,0,0)",
-    
-      border: "0 none",
-      borderRadius: "10px",
-      boxShadow: "0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 6px 10px 0 rgba(0, 0, 0, 0.19)",
-      padding: "20px 30px",
-      boxSizing: "border-box",
       
-      margin: "auto",
-      position: "relative",
-    
-      width: "350px",
-      height: "600px",
     } : {
       
       background: "rgba(0,0,0,0)",
