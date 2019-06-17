@@ -49,13 +49,13 @@ class DashBoardView extends React.Component {
 
     changeChannel(channel) {
         //TODO: REMEMBER IN USER TOKEN
-        console.log('reload');
         this.setState({channel: channel});
         this.pullFromDatabase();
     }
 
     pullFromDatabase() {
         this.props.db.collection("category").get().then(querySnapshot => {
+            this.setState({channelMap: 'None'});
             var channelMap = new Map();
             querySnapshot.forEach(doc => {
                 // TODO: insert sort by alphanumeric??
