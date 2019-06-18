@@ -157,8 +157,7 @@ class FeedBody extends Component {
         }).catch(err => {
             console.log('Error getting document', err);
         });
-        this.componentDidMount();
-        //this.pullFromDatabase([], "feed", this.state.category + "/" + this.state.channel);
+        this.pullFromDatabase([], "feed", this.props.category + "/" + this.props.channel);
     }
 
     pushItemSorted(list, id, data) {
@@ -175,8 +174,9 @@ class FeedBody extends Component {
     }
 
     pullFromDatabase(items, content, prefixPath) {
-        //alert('call');
+        console.log('call');
         if (content === "users") {
+            console.log('users');
             this.props.db.collection("users").get().then(querySnapshot => {
                 var userMap = new Map();
                 querySnapshot.forEach(doc => {
@@ -210,6 +210,7 @@ class FeedBody extends Component {
                 itemsRef = itemsRef.items;
             }
             currentRef.get().then(querySnapshot => {
+                console.log(querySnapshot);
                 querySnapshot.forEach(doc => {
                     // doc.data() is never undefined for query doc snapshots
                     //console.log(doc.id, " => ", doc.data());
