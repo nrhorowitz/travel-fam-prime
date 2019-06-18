@@ -15,6 +15,7 @@ import LoadingPageView from './LoadingPageView.js';
 import SignUpView from './SignUpView';
 import firebase from 'firebase';
 import 'firebase/auth';
+import LoginView from './LoginView';
 import ProfileView from './ProfileView.js';
 
 const db = firebase.firestore();
@@ -33,6 +34,8 @@ class App extends Component {
         this.existingUser = this.existingUser.bind(this);
         this.handlePhoneEntry = this.handlePhoneEntry.bind(this);
         this.updateViewToId = this.updateViewToId.bind(this);
+
+        this.loginUser = this.loginUser.bind(this);
     }
 
     componentDidMount() {
@@ -40,8 +43,9 @@ class App extends Component {
         // this.segueToView("LandingPageView");
         // this.segueToView("DashBoardView");
         //this.segueToView("SMSVerificationView");
-        // this.segueToView("SignUpView");
-        this.segueToView("ProfileView");
+        this.segueToView("SignUpView");
+        // this.segueToView("ProfileView");
+        // this.segueToView("LoginView");
     }
 
     // componentWillUnmount() {
@@ -69,8 +73,8 @@ class App extends Component {
         console.log("setnewuser's credential here")
         console.log(credential);
         console.log(user.password);
+        console.log(user);
 
-        var jsonCredential = JSON.stringify(credential);
         console.log("this is user uid", user.uid);
         this.setState({currentUserId: user.uid});
         //erroring because user id is null when called 
@@ -97,24 +101,51 @@ class App extends Component {
 
 
 
-        this.setNewCredential(user, jsonCredential);
+        this.setNewCredential(user, credential);
     }
 
-    setNewCredential(user, jsonCred) {
+    setNewCredential(user, credential) {
         console.log("SETNEWTNOIW JSONCRED");
-        console.log(jsonCred);
+        console.log(credential);
         
         //when reading credential from firebase, need to use JSON.parse(credential) to unparse it from JSON format
         
         // const cred = credential.map((obj) => {return Object.assign({}, obj)});
-        db.collection('credentials').doc(user.uid).set({
-            credential: jsonCred,
-            password: user.password
+        db.collection('credentials').doc(user.phoneNumber).set({
+            credential: credential,
+            password: user.password,
+            userId: user.uid
             
             
         }).catch(function(error) {
             console.error("Error storing credential and password: ", error);
         })
+    }
+
+    loginUser(phoneNumber, password) {
+        // var cred = JSON.parse(jsonCred);
+        
+        var docRef = db.collection("credentials").doc(phoneNumber);
+        docRef.get().then(function(doc) {
+            if (doc.exists) { 
+                if (password === doc.data().password) {
+                    this.state.currentUserId = doc.data().userId;
+                    const cred = doc.data().credential
+                    const pw = doc.data().password
+                    console.log("User Credential Data:", cred);
+                    console.log("User password data", pw)
+                    firebase.auth().signInWithCredential(cred);
+                    console.log("user logged in successfully");
+                } else {
+                    alert("incorrect password");
+                }
+            } else {
+                console.log("No such user");
+                alert("incorrect phone number")
+            }
+        }.bind(this)).catch(function(error) {
+            console.log("Error getting user data:", error);
+        });
     }
 
 
@@ -159,11 +190,21 @@ class App extends Component {
                     
                 </ProfileView>
             )
+        } else if (this.state.currentView === "LoginView"){
+            return (
+                <LoginView 
+                    segueToView = {this.segueToView}
+                    firebase = {firebase}
+                    loginUser = {this.loginUser}
+                >
+                </LoginView>
+            )
         }
-        if (this.state.currentView === "LandingPageView") {
+        else if (this.state.currentView === "LandingPageView") {
             return (
                 <LandingPageView
                     handlePhoneEntry = {this.handlePhoneEntry}
+                    segueToView = {this.segueToView}
                 />
             )
         } else if (this.state.currentView === "SignUpView") {

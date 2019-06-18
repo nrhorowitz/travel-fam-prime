@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import firebase from 'firebase'; 
 import 'firebase/auth';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
@@ -7,30 +6,31 @@ import DashBoardView from './DashBoardView.js';
 import PhoneInput from 'react-phone-number-input';
 // import 'react-phone-number-input/react-responsive-ui';
 import 'react-phone-number-input/style.css'
+import firebase from '../config/Fire';
 
 var globalProps = "";
 //Initializing firebase with sms-verification database
-firebase.initializeApp({
-  apiKey: "AIzaSyAtrvGB8pwYWmyRwG02svHpAkh5QWzh9yk",
-  authDomain: "travelfamprime.firebaseapp.com",
-  databaseURL: "https://travelfamprime.firebaseio.com",
-  projectId: "travelfamprime",
-  storageBucket: "travelfamprime.appspot.com",
-  messagingSenderId: "33000924700",
-  appId: "1:33000924700:web:6a94b73ffb29331e"
-})
+// firebase.initializeApp({
+//   apiKey: "AIzaSyAtrvGB8pwYWmyRwG02svHpAkh5QWzh9yk",
+//   authDomain: "travelfamprime.firebaseapp.com",
+//   databaseURL: "https://travelfamprime.firebaseio.com",
+//   projectId: "travelfamprime",
+//   storageBucket: "travelfamprime.appspot.com",
+//   messagingSenderId: "33000924700",
+//   appId: "1:33000924700:web:6a94b73ffb29331e"
+// })
 
 
-//telling firebase to use device's default langauge
-firebase.auth().useDeviceLanguage();
+// //telling firebase to use device's default langauge
+// firebase.auth().useDeviceLanguage();
 
 
 // firebase.auth().settings.appVerificationDisabledForTesting = true;
 const logo = require('../img/Logo3.png');
 const backArrow = require('../img/back.svg');
 const fsParentDiv = {
-  paddingTop: "80px",
-  paddingBottom: "80px"
+  paddingTop: "50px",
+  paddingBottom: "50px"
 }
 
 const backArrowStyle = {
@@ -255,7 +255,9 @@ class SignUpView extends Component {
       confirmationResult.confirm(smsCode).then(function (result) {
         console.log("Successful login!")
         var credential = firebase.auth.PhoneAuthProvider.credential(confirmationResult.verificationId, smsCode); 
-        console.log(credential);
+        // firebase.auth().signInWithCredential(credential);
+        // console.log("yeet")
+        // console.log(credential);
         var user = result.user;
       
         //user and credential are being updated to state here
