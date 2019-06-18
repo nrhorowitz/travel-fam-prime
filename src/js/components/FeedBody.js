@@ -175,7 +175,7 @@ class FeedBody extends Component {
     }
 
     pullFromDatabase(items, content, prefixPath) {
-        alert('call');
+        //alert('call');
         if (content === "users") {
             this.props.db.collection("users").get().then(querySnapshot => {
                 var userMap = new Map();
