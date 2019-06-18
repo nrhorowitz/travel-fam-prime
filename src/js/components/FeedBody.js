@@ -122,7 +122,6 @@ class FeedBody extends Component {
     componentDidMount() {
         this.pullFromDatabase([], "users", "");
         this.pullFromDatabase([], "feed", this.props.category + "/" + this.props.channel);
-        this.pullFromDatabase([], "wrapperload", "");
     }
 
     writeToDatabase(input, prefixPath) {
@@ -176,6 +175,7 @@ class FeedBody extends Component {
     }
 
     pullFromDatabase(items, content, prefixPath) {
+        alert('call');
         if (content === "users") {
             this.props.db.collection("users").get().then(querySnapshot => {
                 var userMap = new Map();
@@ -221,12 +221,6 @@ class FeedBody extends Component {
                     }
                 });
                 this.setState({items: this.state.items}); //*****
-            }).catch(err => {
-                console.log('Error getting document', err);
-            });
-        } else if (content === "wrapperload") {
-            this.props.db.collection("users").get().then(querySnapshot => {
-                console.log('loaded');
             }).catch(err => {
                 console.log('Error getting document', err);
             });
