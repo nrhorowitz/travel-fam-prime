@@ -77,9 +77,12 @@ class DashBoardView extends React.Component {
                 </div>
             )
         } else {
+            console.log(this.props.currentUser);
             return(
                 <div>
-                    <AppNavBar></AppNavBar>
+                    <AppNavBar
+                        segueToView = {this.props.segueToView}
+                    ></AppNavBar>
                     <ContentContainer
                         db = {this.props.db}
                         category = {this.state.category}

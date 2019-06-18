@@ -39,11 +39,25 @@ class App extends Component {
     }
 
     componentDidMount() {
+        console.log('APP COMPONENT RENDER');
+        firebase.auth().onAuthStateChanged((user) => {
+          if (user) {
+              if ((user.displayName !== undefined) && (user.email !== undefined) && (user.password !== undefined)) {
+                  this.segueToView("DashBoardView");
+              } else {
+                  this.segueToView("SignUpView");
+              }
+            // User is signed in.
+          } else {
+              this.segueToView("SignUpView");
+            // No user is signed in.
+          }
+        });
 
         // this.segueToView("LandingPageView");
-        this.segueToView("DashBoardView");
+
         //this.segueToView("SMSVerificationView");
-        this.segueToView("SignUpView");
+
         // this.segueToView("ProfileView");
         // this.segueToView("LoginView");
     }
@@ -69,7 +83,7 @@ class App extends Component {
     }
 
     setNewUser(user, credential, email, firstName, lastName) {
-        // alert(firebase.currentUser);
+        alert(firebase.currentUser);
         console.log("setnewuser's credential here")
         console.log(credential);
         console.log(user.password);
@@ -107,27 +121,28 @@ class App extends Component {
     setNewCredential(user, credential) {
         console.log("SETNEWTNOIW JSONCRED");
         console.log(credential);
-        
+
         //when reading credential from firebase, need to use JSON.parse(credential) to unparse it from JSON format
 
         // const cred = credential.map((obj) => {return Object.assign({}, obj)});
         db.collection('credentials').doc(user.phoneNumber).set({
-            credential: credential,
             password: user.password,
             userId: user.uid
-            
-            
-        }).catch(function(error) {
+
+
+        }).then(() => {
+            this.segueToView("DashBoardView");
+        }).catch(error => {
             console.error("Error storing credential and password: ", error);
         })
     }
 
     loginUser(phoneNumber, password) {
         // var cred = JSON.parse(jsonCred);
-        
+
         var docRef = db.collection("credentials").doc(phoneNumber);
         docRef.get().then(function(doc) {
-            if (doc.exists) { 
+            if (doc.exists) {
                 if (password === doc.data().password) {
                     this.state.currentUserId = doc.data().userId;
                     const cred = doc.data().credential
@@ -186,13 +201,15 @@ class App extends Component {
     currentPage() {
         if (this.state.currentView === "ProfileView") {
             return (
-                <ProfileView segueToView = {this.segueToView}>
-
+                <ProfileView
+                    segueToView = {this.segueToView}
+                    currentUser = {firebase.auth().currentUser}
+                >
                 </ProfileView>
             )
         } else if (this.state.currentView === "LoginView"){
             return (
-                <LoginView 
+                <LoginView
                     segueToView = {this.segueToView}
                     firebase = {firebase}
                     loginUser = {this.loginUser}
@@ -231,6 +248,7 @@ class App extends Component {
                 <DashBoardView
                     segueToView = {this.segueToView}
                     db = {db}
+                    currentUser = {firebase.auth().currentUser}
                 />
             )
         } else if (this.state.currentView === "SMSVerificationView") {

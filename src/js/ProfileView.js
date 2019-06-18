@@ -5,6 +5,7 @@ import Switch from '@material-ui/core/Switch';
 import AppNavBar from './components/AppNavBar.js';
 import ContentContainer from './components/ContentContainer.js';
 import TextField from '@material-ui/core/TextField';
+import Typography from '@material-ui/core/Typography';
 
 import '../css/App.css';
 
@@ -38,14 +39,14 @@ const editButtonStyle = {
 const footerButtonStyle = {
     border: "none",
     outline: "none",
-    cursor: "pointer",  
+    cursor: "pointer",
 }
 const footerButtonGroup = {
     position: "absolute",
     bottom: "0",
     marginBottom: "40px",
     left: "50%",
-    marginLeft: "-85px", 
+    marginLeft: "-85px",
 }
 const buttonStyle = {
     display: "table",
@@ -54,16 +55,16 @@ const buttonStyle = {
     width: "150px"
 }
 const updateButtonStyle = {
-    
+
     display: "table",
     margin: "0 auto",
     marginTop: "30px"
 
 }
 const nameLocationContainer = {
-    margin: "0 auto", 
-    display: "table", 
-    textAlign: "center", 
+    margin: "0 auto",
+    display: "table",
+    textAlign: "center",
     lineHeight: "0.5",
     marginBottom: "20px"
 }
@@ -81,11 +82,11 @@ const containerStyle = {
     borderRadius: "10px",
     boxShadow: "0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 6px 10px 0 rgba(0, 0, 0, 0.19)",
     padding: "40px 30px",
-    boxSizing: "border-box",   
+    boxSizing: "border-box",
     margin: "auto",
     marginTop: "20px",
     marginBottom: "30px",
-    position: "relative", 
+    position: "relative",
     width: "350px",
     height: "700px",
 }
@@ -112,7 +113,7 @@ const profilePictureBorder = {
 const textAreaContainer = {
     display: "table",
     margin: "0 auto",
-    
+
 }
 const editViewLocationTextStyle = {
     width: "100%",
@@ -126,7 +127,7 @@ const editViewLocationTextStyle = {
 }
 const editViewDescribeTextStyle = {
     width: "100%",
-    
+
     height: "250px",
     resize: "none",
     backgroundColor: "#EDEDED",
@@ -136,7 +137,7 @@ const editViewDescribeTextStyle = {
     outline: "none",
     fontSize: "15px",
     overflow: "auto",
-    
+
 }
 const editViewSocialMedia = {
     display: "flex",
@@ -144,12 +145,12 @@ const editViewSocialMedia = {
     flexDirection: "column",
     justifyContent: "space-between",
     marginTop: "20px"
-    
+
 }
 const editViewSmButtonStyle = {
     border: "none",
     outline: "none",
-    cursor: "pointer",  
+    cursor: "pointer",
     marginBottom: "10px"
 }
 class ProfileView extends React.Component {
@@ -165,6 +166,11 @@ class ProfileView extends React.Component {
             editState: false,
             locationText: ""
         }
+
+        if (this.props.currentUser.describeText === undefined) {
+            this.props.currentUser.describeText = " dog ";
+        }
+        console.log(this.props.currentUser);
     }
 
     handleDescribeChange(event) {
@@ -219,9 +225,11 @@ class ProfileView extends React.Component {
         if (this.state.editState === false) {
             return(
                 <div>
-                    
-                    <AppNavBar></AppNavBar>
-                    
+
+                    <AppNavBar
+                        segueToView = {this.props.segueToView}
+                    ></AppNavBar>
+
                     <div style={parentDiv}>
                         <div id="profile" style={containerStyle}>
 
@@ -230,15 +238,19 @@ class ProfileView extends React.Component {
                             </div>
 
                             <div style={nameLocationContainer}>
-                                <h1 style={nameStyle}>Travelfam Bot</h1>
+                                <Typography variant="h4">Name {this.props.currentUser.displayName}</Typography>
                                 <p style={locationStyle}>{this.state.locationText}</p>
                                 <button style={editButtonStyle} onClick={() => {
                                     this.setState({editState: true, hideDescribeText: true})
                                 }}><img style={editButtonLogoStyle} src={editButton} alt="Edit"/> Edit Profile</button>
                             </div>
-                            
-                            <div id="describe" style={describeContainer}>{this.state.describeText}</div>
 
+                            <div id="describe" style={describeContainer}>{this.props.currentUser.describeText}</div>
+
+                            <Button style={buttonStyle} variant="contained" color="secondary">
+                                //ICON
+                                EDIT
+                            </Button>
                             <Button style={buttonStyle} variant="contained" color="secondary">Vouch</Button>
                             <Button style={buttonStyle} variant="contained" color="primary">Message</Button>
 
@@ -256,7 +268,9 @@ class ProfileView extends React.Component {
         } else {
             return (
                 <div>
-                    <AppNavBar></AppNavBar>
+                    <AppNavBar
+                        segueToView = {this.props.segueToView}
+                    ></AppNavBar>
 
                     <div style={parentDiv}>
                         <div id="profile" style={containerStyle}>
@@ -267,7 +281,7 @@ class ProfileView extends React.Component {
 
                             <div style={nameLocationContainer}>
                                 <h1 style={nameStyle}>Travelfam Bot</h1>
-                            
+
                             </div>
 
                             <div style={describeContainer}></div>
@@ -275,7 +289,7 @@ class ProfileView extends React.Component {
                                 <input id="newLocationText" placeholder="City, State..." style={editViewLocationTextStyle} onChange={this.handleLocationChange}></input>
                                 <textarea id="newDescribeText" placeholder="Introduce yourself..." style={editViewDescribeTextStyle} onChange={this.handleDescribeChange}></textarea>
                             </div>
-                            
+
                             {/* <div style={editViewSocialMedia}>
                                 <div style={editViewSmButtonStyle}><img style={footerLogoStyle} src={instagramLogo} alt="instagram"></img><Switch>Link</Switch></div>
                                 <div style={editViewSmButtonStyle}><img style={footerLogoStyle} src={facebookLogo} alt="facebook"></img></div>
@@ -287,7 +301,7 @@ class ProfileView extends React.Component {
 
                             <Button style={updateButtonStyle} variant="contained" color="secondary" onClick={() => {
                                 this.setState({
-                                    editState: false, hideDescribeText: false, 
+                                    editState: false, hideDescribeText: false,
                                     })
                             }}>Update Profile</Button>
 

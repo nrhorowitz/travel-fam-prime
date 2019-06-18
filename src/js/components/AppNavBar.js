@@ -16,7 +16,7 @@ const logo = require('../../img/Logo3.png');
 const useStyles = makeStyles(theme => ({
   grow: {
     flexGrow: 1,
-    
+
   },
   menuButton: {
     marginRight: theme.spacing(2),
@@ -76,7 +76,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-function AppNavBar() {
+function AppNavBar(props) {
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
@@ -97,6 +97,11 @@ function AppNavBar() {
     handleMobileMenuClose();
   }
 
+  function menuButton(path) {
+      handleMenuClose();
+      props.segueToView(path);
+  }
+
   function handleMobileMenuOpen(event) {
     setMobileMoreAnchorEl(event.currentTarget);
   }
@@ -112,7 +117,7 @@ function AppNavBar() {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleMenuClose}>My Profile</MenuItem>
+      <MenuItem onClick={() => menuButton("ProfileView")}>My Profile</MenuItem>
       <MenuItem onClick={handleMenuClose}>Invite Friends</MenuItem>
       <MenuItem onClick={handleMenuClose}>Account Information</MenuItem>
       <MenuItem onClick={handleMenuClose}>Linked Accounts</MenuItem>
@@ -131,7 +136,7 @@ function AppNavBar() {
       onClose={handleMobileMenuClose}
     >
       <MenuItem>
-        <Button color="inherit">Networks</Button>
+        <Button onClick={() => props.segueToView("DashBoardView")} color="inherit">Networks</Button>
       </MenuItem>
       <MenuItem>
         <Button color="inherit">Messages</Button>
@@ -170,7 +175,7 @@ function AppNavBar() {
           </div>
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>
-            <Button color="inherit">Networks</Button>
+            <Button color="inherit" onClick={() => props.segueToView("DashBoardView")}>Networks</Button>
             <Button color="inherit">Messages</Button>
             <IconButton
               edge="end"
