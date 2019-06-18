@@ -6,6 +6,7 @@ import AccountTag from './AccountTag';
 import TextField from '@material-ui/core/TextField';
 import uuid from 'uuid';
 import { textAlign } from '@material-ui/system';
+import ReplyBox from './ReplyBox';
 
 const postBox = {
     backgroundColor: "#FFFFFF",
@@ -103,8 +104,6 @@ class FeedBody extends Component {
         super(props);
         this.state = {
             //hardcoding posts for now
-            category: 'music-festival',
-            channel: 'edc-la-2019',
             items: [],
             userMap: []
         }
@@ -113,15 +112,70 @@ class FeedBody extends Component {
         this.readSinglePost = this.readSinglePost.bind(this);
         this.readSinglePostRecursive = this.readSinglePostRecursive.bind(this);
         this.pullFromDatabase = this.pullFromDatabase.bind(this);
+        this.writeToDatabase = this.writeToDatabase.bind(this);
+        this.toggleReplyBoxVisible = this.toggleReplyBoxVisible.bind(this);
+        this.getVisibleFromPath = this.getVisibleFromPath.bind(this);
+        this.showReplyBox = this.showReplyBox.bind(this);
+        this.pushItemSorted = this.pushItemSorted.bind(this);
     }
 
     componentDidMount() {
         this.pullFromDatabase([], "users", "");
-        this.pullFromDatabase([], "feed", this.state.category + "/" + this.state.channel);
-        this.pullFromDatabase([], "wrapperload", "");
+        this.pullFromDatabase([], "feed", this.props.category + "/" + this.props.channel);
+    }
+
+    writeToDatabase(input, prefixPath) {
+        var currentRef = this.props.db.collection("category");
+        var pathArray = prefixPath.split("/");
+        var itemsRef = this.state;
+        for (var i = 0; i < pathArray.length; i += 1) {
+            if (i % 2 === 0) {
+                currentRef = currentRef.doc(pathArray[i]);
+            } else {
+                currentRef = currentRef.collection(pathArray[i]);
+            }
+        }
+        //UPDATE REPLIES ON COMMENTED
+        currentRef.get().then(querySnapshot => {
+            var prevReplyCount = querySnapshot.data().replies;
+            currentRef.update({replies: prevReplyCount+1});
+        }).catch(err => {
+            console.log('Error getting document', err);
+        });
+
+        var today = new Date();
+        var currentDate = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+        var currentTime = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+        currentRef.collection("reply").add({
+            id: '0RHvET4AUXlPGr3Ug921',
+            message: input,
+            replies: 0,
+            creationDate: currentDate + "/" + currentTime,
+            date: currentDate + "/" + currentTime,
+        }).then(() => {
+            console.log('added');
+        }).catch(err => {
+            console.log('Error getting document', err);
+        });
+        this.componentDidMount();
+        //this.pullFromDatabase([], "feed", this.state.category + "/" + this.state.channel);
+    }
+
+    pushItemSorted(list, id, data) {
+        var date = data.date;
+        //list is a sorted list by timestamp with most recent (largest data/time) at the front
+        for (var i = 0; i < list.length; i += 1) {
+            var currentDate = list[i].data.date;
+            if (date >= currentDate) {
+                list.splice(i, 0, {id: id, data: data, replyBox: false});
+                return;
+            }
+        }
+        list.push({id: id, data: data, replyBox: false});
     }
 
     pullFromDatabase(items, content, prefixPath) {
+        //alert('call');
         if (content === "users") {
             this.props.db.collection("users").get().then(querySnapshot => {
                 var userMap = new Map();
@@ -130,7 +184,6 @@ class FeedBody extends Component {
                     //console.log(doc.id, " => ", doc.data());
                     userMap.set(doc.id, doc.data());
                 });
-                console.log(userMap);
                 this.setState({userMap: userMap});
             }).catch(err => {
                 console.log('Error getting document', err);
@@ -139,59 +192,47 @@ class FeedBody extends Component {
             var currentRef = this.props.db.collection("category");
             var pathArray = prefixPath.split("/");
             var itemsRef = this.state;
+            if (items.length === 0) { //RESET IF FIRST
+                itemsRef.items = [];
+            }
             for (var i = 0; i < pathArray.length; i += 2) {
                 currentRef = currentRef.doc(pathArray[i]);
                 currentRef = currentRef.collection(pathArray[i + 1]);
-                if (itemsRef.items === undefined) {
-                    for (var j = 0; j < itemsRef.length; j += 1) {
-                        if (itemsRef[j].id === pathArray[i]) {
-                            console.log(itemsRef);
-                            itemsRef = itemsRef[j].data;
-                            console.log(itemsRef);
-                            break;
-                        }
+                for (var j = 0; j < itemsRef.length; j += 1) {
+                    if (itemsRef[j].id === pathArray[i]) {
+                        itemsRef = itemsRef[j].data;
+                        break;
                     }
+                }
+                if (itemsRef.items === undefined) {
                     itemsRef.items = [];
-                    console.log(itemsRef);
                 }
                 itemsRef = itemsRef.items;
             }
-            console.log(itemsRef);
             currentRef.get().then(querySnapshot => {
                 querySnapshot.forEach(doc => {
                     // doc.data() is never undefined for query doc snapshots
                     //console.log(doc.id, " => ", doc.data());
-                    itemsRef.push({id: doc.id, data: doc.data()}); //timestamp is the max time of all elements in tree - deleting new reply will cause post to go back down
 
-                    if ((doc.data().replies > 0) && (true)) {
-                        this.pullFromDatabase(doc.data(), "feed", this.state.category + "/" + this.state.channel + "/" + doc.id + "/reply");
+                    this.pushItemSorted(itemsRef, doc.id, doc.data()); //TODO: remove other
+                    //itemsRef.push({id: doc.id, data: doc.data(), replyBox: false}); //timestamp is the max time of all elements in tree - deleting new reply will cause post to go back down
+                    if (doc.data().replies > 0) {
+                        this.pullFromDatabase(doc.data(), "feed", prefixPath + "/" + doc.id + "/reply");
                     }
                 });
-                console.log(this.state.items);
-                this.setState({items: this.state.items});
-            }).catch(err => {
-                console.log('Error getting document', err);
-            });
-        } else if (content === "wrapperload") {
-            this.props.db.collection("users").get().then(querySnapshot => {
-                console.log('loaded');
+                this.setState({items: this.state.items}); //*****
             }).catch(err => {
                 console.log('Error getting document', err);
             });
         }
     }
 
-    replyToPost() {
-        alert("REPLY!")
-    }
-
-    readSinglePostRecursive(id, data) {
+    readSinglePostRecursive(id, data, path) {
         if (data !== undefined) {
-            console.log(data);
             return (
                 <List>
                     {data.map(({id, data}) => (
-                        this.readSinglePost(data.id, data)
+                        this.readSinglePost(data.id, data, path + "/reply/" + id)
                     ))}
                 </List>
             )
@@ -203,43 +244,103 @@ class FeedBody extends Component {
         }
     }
 
-    readSinglePost(id, data) {
+    toggleReplyBoxVisible(id) {
+        //GO TO PATH TOGGLE IN STATE
+        var pathArray = id.split("/");
+        var itemsRef = this.state;
+        for (var i = 0; i < pathArray.length - 1; i += 2) {
+            for (var j = 0; j < itemsRef.length; j += 1) {
+                if (itemsRef[j].id === pathArray[i]) {
+                    itemsRef = itemsRef[j].data;
+                    break;
+                }
+            }
+            if (itemsRef.items === undefined) {
+                itemsRef.items = [];
+            }
+            itemsRef = itemsRef.items;
+        }
+        for (var j = 0; j < itemsRef.length; j += 1) {
+            if (itemsRef[j].id === pathArray[pathArray.length-1]) {
+                itemsRef[j].replyBox = !itemsRef[j].replyBox;
+                break;
+            }
+        }
+        this.setState({items: this.state.items});
+    }
+
+    getVisibleFromPath(id) {
+        var pathArray = id.split("/");
+        var itemsRef = this.state;
+        for (var i = 0; i < pathArray.length - 1; i += 2) {
+            for (var j = 0; j < itemsRef.length; j += 1) {
+                if (itemsRef[j].id === pathArray[i]) {
+                    itemsRef = itemsRef[j].data;
+                    break;
+                }
+            }
+            if (itemsRef.items === undefined) {
+                itemsRef.items = [];
+            }
+            itemsRef = itemsRef.items;
+        }
+        for (var j = 0; j < itemsRef.length; j += 1) {
+            if (itemsRef[j].id === pathArray[pathArray.length-1]) {
+                return itemsRef[j].replyBox;
+            }
+        }
+    }
+
+    showReplyBox(id, data, path) {
+        if (this.getVisibleFromPath(path)) {
+            return (
+                <ReplyBox id={path} writeToDatabase={this.writeToDatabase} visible={(() => (this.getVisibleFromPath(path)))} toggleReplyBoxVisible={this.toggleReplyBoxVisible}></ReplyBox>
+            )
+        } else {
+            return (
+                <div>
+                </div>
+            )
+        }
+    }
+
+    readSinglePost(id, data, path) {
         var replyString = "";
         if (data.replies === 0) {
             replyString = " Comment";
         } else {
             replyString = " " + data.replies + " Comments";
         }
-        console.log(data);
         return (
             <ListItem style={postedBox}>
                 <div style={{marginBottom: "70px"}}>
-                    <AccountTag id={id} userMap={this.state.userMap} data={data}></AccountTag>
+                    <AccountTag id={data.id} userMap={this.state.userMap} data={data}></AccountTag>
                     <div id="outputPost" style={outputPost}>
                         {data.message}
                     </div>
                     <div style={footerGroup}>
-                        <div style={footerText} ><img style={footerImages} src={interested_svg} alt="star"/> Interested</div>
-                        <button onClick={this.replyToPost} style={footerText}><img style={footerImages} src={reply_svg} alt="reply"/>{replyString}</button>
+                        <div style={footerText}><img style={footerImages} src={interested_svg} alt="star"/> Interested</div>
+                        <button onClick={(() => (this.toggleReplyBoxVisible(path)))} style={footerText}><img style={footerImages} src={reply_svg} alt="reply"/>{replyString}</button>
                         <div style={footerText}><img style={footerImages} src={share_svg} alt="reply"/> Share</div>
                     </div>
-                    {this.readSinglePostRecursive(id, data.items)}
+                    {this.showReplyBox(id, data, path)}
+                    {this.readSinglePostRecursive(data.id, data.items, path)}
                 </div>
             </ListItem>
         )
     }
 
     readPosts() {
-        console.log(this.state.items);
         if (this.state.items.length == 0) {
             return (
                 <div>LOADING SPINNING CIRCLE</div>
             );
         } else {
+            var path = this.props.category + "/" + this.props.channel;
             return (
                 <List>
                     {this.state.items.map(({id, data}) => (
-                        this.readSinglePost(data.id, data)
+                        this.readSinglePost(id, data, path + "/" + id)
                     ))}
                 </List>
             )
@@ -248,7 +349,6 @@ class FeedBody extends Component {
     }
 
     readBody() {
-        //const { items } = this.state;
         return(
             <div>
 
@@ -266,19 +366,19 @@ class FeedBody extends Component {
                         var currentDate = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
                         var currentTime = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
                         if (input !== '') {
-                            this.props.db.collection("category").doc(this.state.category).collection(this.state.channel).add({
+                            this.props.db.collection("category").doc(this.props.category).collection(this.props.channel).add({
                                 id: '0RHvET4AUXlPGr3Ug921',
                                 message: input,
                                 replies: 0,
-                                date: currentDate,
-                                time: currentTime
+                                creationDate: currentDate + "/" + currentTime,
+                                date: currentDate + "/" + currentTime
                             }).then(() => {
                                 console.log('added');
                             }).catch(err => {
                                 console.log('Error getting document', err);
                             });
-                            //this.setState({items: []});
                             this.componentDidMount();
+                            //this.pullFromDatabase([], "feed", this.state.category + "/" + this.state.channel);
                         }
                     }}>
 

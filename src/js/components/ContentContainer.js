@@ -53,21 +53,39 @@ const useStyles = makeStyles(theme => ({
 
 }));
 
+function refreshData() {
+    alert('refresh');
+}
+
 export default function ContentContainer(props) {
     const classes = useStyles();
-
     return (
         <Container className={classes.container}>
             <div className={classes.wrapper}>
 
                 <div className={classes.rowSideBar}>
                     <GenreSideBar style={{ marginTop: "20px"}}></GenreSideBar>
-                    <NetworkSideBar style={{ marginTop: "20px"}}></NetworkSideBar>
+                    <NetworkSideBar
+                        style={{ marginTop: "20px"}}
+                        db = {props.db}
+                        category = {props.category}
+                        channel = {props.channel}
+                        channelMap = {props.channelMap}
+                        changeCategory = {props.changeCategory}
+                        changeChannel = {props.changeChannel}
+                    ></NetworkSideBar>
                 </div>
                 <div className={classes.feed}>
-                    <FeedHeader></FeedHeader>
+                    <FeedHeader
+                        category = {props.category}
+                        channel = {props.channel}
+                        channelMap = {props.channelMap}
+                    ></FeedHeader>
                     <FeedBody
                         db = {props.db}
+                        category = {props.category}
+                        channel = {props.channel}
+                        channelMap = {props.channelMap}
                     ></FeedBody>
 
                 </div>
