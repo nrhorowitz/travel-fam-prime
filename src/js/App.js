@@ -26,6 +26,7 @@ class App extends Component {
         this.state = {
             currentUserId: "",
             currentView: "LoadingPageView",
+            viewId: ""
         };
         this.segueToView = this.segueToView.bind(this);
         this.addNewUserInfo = this.addNewUserInfo.bind(this);
@@ -36,13 +37,15 @@ class App extends Component {
         this.updateViewToId = this.updateViewToId.bind(this);
 
         this.loginUser = this.loginUser.bind(this);
+        this.setViewId = this.setViewId.bind(this);
     }
 
     componentDidMount() {
         console.log('APP COMPONENT RENDER');
         firebase.auth().onAuthStateChanged((user) => {
           if (user) {
-              if ((user.displayName !== undefined) && (user.email !== undefined) && (user.password !== undefined)) {
+              //if ((user.displayName !== undefined) && (user.email !== undefined) && (user.password !== undefined)) {
+              if (user.displayName !== null) {
                   this.segueToView("DashBoardView");
               } else {
                   this.segueToView("SignUpView");
@@ -198,12 +201,17 @@ class App extends Component {
         }
     }
 
+    setViewId(id) {
+        this.setState({viewId: id});
+    }
+
     currentPage() {
         if (this.state.currentView === "ProfileView") {
             return (
                 <ProfileView
                     segueToView = {this.segueToView}
                     currentUser = {firebase.auth().currentUser}
+                    viewId = {this.state.viewId}
                 >
                 </ProfileView>
             )
@@ -249,6 +257,7 @@ class App extends Component {
                     segueToView = {this.segueToView}
                     db = {db}
                     currentUser = {firebase.auth().currentUser}
+                    setViewId = {this.setViewId}
                 />
             )
         } else if (this.state.currentView === "SMSVerificationView") {

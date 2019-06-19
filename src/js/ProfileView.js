@@ -16,7 +16,7 @@ const snapchatLogo = require('../img/snapchat.svg');
 const twitterLogo = require('../img/twitter.svg');
 const editButton = require('../img/EditButton.svg');
 const parentDiv = {
-    paddingTop: "80px",
+    paddingTop: "60px",
     marginTop: "15px"
 }
 const editButtonLogoStyle = {
@@ -161,16 +161,17 @@ class ProfileView extends React.Component {
         this.handleDescribeChange = this.handleDescribeChange.bind(this);
         this.handleLocationChange = this.handleLocationChange.bind(this);
         this.state = {
-            describeText: "",
+            describeText: "describe loren loren loren loren loren loren loren loren loren loren loren loren loren loren loren loren loren loren loren loren loren loren loren loren loren loren loren loren",
             hideDescribeText: false,
             editState: false,
-            locationText: ""
-        }
-
-        if (this.props.currentUser.describeText === undefined) {
-            this.props.currentUser.describeText = " dog ";
+            locationText: "location",
+            displayState: "ViewSelf" //ViewOther
         }
         console.log(this.props.currentUser);
+
+        this.profileHeader = this.profileHeader.bind(this);
+        this.profileText = this.profileText.bind(this);
+        this.profileButtons = this.profileButtons.bind(this);
     }
 
     handleDescribeChange(event) {
@@ -182,15 +183,7 @@ class ProfileView extends React.Component {
     }
 
     componentDidMount() {
-        if (this.state.editState === false) {
-            if (this.state.describeText === "") {
-                this.setState({hideDescribeText: true})
-            } else {
-                this.setState({hideDescribeText: false})
-                document.getElementById("describe").innerHTML = this.state.describeText;
-            }
-        }
-        document.getElementById.locationText = this.state.locationText;
+
     }
 
     changePage(direction) {
@@ -209,10 +202,51 @@ class ProfileView extends React.Component {
         );
     }
 
+    profileHeader() {
+        return (
+            <div style={profilePictureBorder}>
+                {/* user profile picture here */}
+            </div>
+        )
+    }
+
+    profileText() {
+        var displayArray = this.props.currentUser.displayName.split("/");
+        var name = displayArray[0];
+        var location = displayArray[1];
+        var description = displayArray[2];
+        return (
+            <div>
+                <div style={nameLocationContainer}>
+                    <Typography variant="h4">{name}</Typography>
+                    <p style={locationStyle}>{location}</p>
+
+                </div>
+                <Typography variant="subtitle1">{description}</Typography>
+            </div>
+        )
+    }
+
+    //<img style={editButtonLogoStyle} src={editButton} alt="Edit"/>
+    profileButtons() {
+        return (
+            <div>
+                <Button style={buttonStyle} variant="contained" color="secondary" onClick={() => alert('bork')}>
+                    Edit Profile
+                </Button>
+                <Button style={buttonStyle} variant="contained" color="primary" onClick={() => alert('save')}>
+                    Save Changes
+                </Button>
+                <Button style={buttonStyle} variant="contained" color="secondary">Vouch</Button>
+                <Button style={buttonStyle} variant="contained" color="primary">Message</Button>
+            </div>
+        )
+    }
+
     render() {
         const describeContainer = this.state.hideDescribeText ? {
             display: 'none',
-          } : {
+        } : {
             display: "table",
             margin: "0 auto",
             width: "220px",
@@ -220,15 +254,28 @@ class ProfileView extends React.Component {
             marginTop: "10px",
             textAlign: "center",
             fontSize: "14px"
-          }
+        }
+
+        return (
+            <div style={parentDiv}>
+                <AppNavBar
+                    segueToView = {this.props.segueToView}
+                ></AppNavBar>
+                <div id="profile" style={containerStyle}>
+                    {this.props.viewId}
+                    {this.profileHeader()}
+                    {this.profileText()}
+                    {this.profileButtons()}
+                </div>
+            </div>
+        )
+
 
         if (this.state.editState === false) {
             return(
                 <div>
 
-                    <AppNavBar
-                        segueToView = {this.props.segueToView}
-                    ></AppNavBar>
+
 
                     <div style={parentDiv}>
                         <div id="profile" style={containerStyle}>

@@ -99,11 +99,18 @@ function AppNavBar(props) {
 
   function menuButton(path) {
       handleMenuClose();
+      if (path === "ProfileView") {
+          props.setViewId(props.currentUser.uid);
+      }
       props.segueToView(path);
   }
 
   function handleMobileMenuOpen(event) {
     setMobileMoreAnchorEl(event.currentTarget);
+  }
+
+  function viewSelfProfile() {
+
   }
 
   const menuId = 'primary-search-account-menu';

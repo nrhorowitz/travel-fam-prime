@@ -120,7 +120,7 @@ var handleSignedInUser = function(user, credential, email, firstName, lastName) 
   globalProps.setNewUser(user, credential, email, firstName, lastName);
   console.log(firebase.currentUser);
   firebase.auth().currentUser.updateProfile({
-      displayName: firstName + " " + lastName,
+      displayName: firstName + " " + lastName + "/(default location)/(default description)",
       photoURL: "https://example.com/jane-q-user/profile.jpg"
     }).then(function() {
       // Update successful.
