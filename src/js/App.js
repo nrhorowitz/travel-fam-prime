@@ -210,7 +210,7 @@ class App extends Component {
             return (
                 <ProfileView
                     segueToView = {this.segueToView}
-                    currentUser = {firebase.auth().currentUser}
+                    firebase = {firebase}
                     viewId = {this.state.viewId}
                 >
                 </ProfileView>

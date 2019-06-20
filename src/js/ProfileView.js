@@ -157,49 +157,32 @@ class ProfileView extends React.Component {
     constructor(props) {
         super(props);
         this.changePage = this.changePage.bind(this);
-        this.createNewButton = this.createNewButton.bind(this);
-        this.handleDescribeChange = this.handleDescribeChange.bind(this);
-        this.handleLocationChange = this.handleLocationChange.bind(this);
         this.state = {
-            describeText: "describe loren loren loren loren loren loren loren loren loren loren loren loren loren loren loren loren loren loren loren loren loren loren loren loren loren loren loren loren",
+            locationText: "",
+            descriptionText: "",
             hideDescribeText: false,
             editState: false,
-            locationText: "location",
-            displayState: "ViewSelf" //ViewOther
+            displayState: "ViewOther" //ViewOther
         }
-        console.log(this.props.currentUser);
+        console.log(this.props.firebase.auth().currentUser);
 
         this.profileHeader = this.profileHeader.bind(this);
         this.profileText = this.profileText.bind(this);
         this.profileButtons = this.profileButtons.bind(this);
-    }
-
-    handleDescribeChange(event) {
-        this.setState({describeText: event.target.value})
-    }
-
-    handleLocationChange(event) {
-        this.setState({locationText: event.target.value})
+        this.handleFieldChange = this.handleFieldChange.bind(this);
+        this.resolveSaveChanges = this.resolveSaveChanges.bind(this);
     }
 
     componentDidMount() {
-
+        if (this.props.firebase.auth().currentUser.uid === this.props.viewId) {
+            this.setState({displayState: "ViewSelf"});
+        } else {
+            this.setState({displayState: "ViewOther"});
+        }
     }
 
     changePage(direction) {
         this.props.segueToView(direction)
-    }
-
-    createNewButton(name, direction) {
-        return (
-            <Button
-                name={name}
-                direction={direction}
-                color="primary"
-                onClick={() => this.changePage(direction)}>
-                {name}
-            </Button>
-        );
     }
 
     profileHeader() {
@@ -210,37 +193,102 @@ class ProfileView extends React.Component {
         )
     }
 
-    profileText() {
-        var displayArray = this.props.currentUser.displayName.split("/");
+    handleFieldChange(label) {
+        if (label === "Location") {
+            return ((e) => this.setState({locationText: e.target.value}));
+        } else if (label === "Description") {
+            return ((e) => this.setState({descriptionText: e.target.value}));
+        }
+    }
+
+    resolveSaveChanges() {
+        console.log(this.state.displayState);
+        var displayArray = this.props.firebase.auth().currentUser.displayName.split("/");
         var name = displayArray[0];
         var location = displayArray[1];
         var description = displayArray[2];
-        return (
-            <div>
+        var newDisplayName = name + "/" + this.state.locationText + "/" + this.state.descriptionText;
+        //TODO (maybe) loading circle for changes to profile
+        this.props.firebase.auth().currentUser.updateProfile({
+            displayName: newDisplayName,
+        }).then(() => {
+            // Update successful.
+            this.setState({displayState: "ViewSelf"});
+        }).catch((error) => {
+            // An error happened.
+        });
+    }
+
+    profileText() {
+        var displayArray = this.props.firebase.auth().currentUser.displayName.split("/");
+        var name = displayArray[0];
+        var location = displayArray[1];
+        var description = displayArray[2];
+        if (this.state.displayState === "ViewSelf") {
+            return (
                 <div style={nameLocationContainer}>
                     <Typography variant="h4">{name}</Typography>
                     <p style={locationStyle}>{location}</p>
-
+                    <Typography variant="subtitle1">{description}</Typography>
                 </div>
-                <Typography variant="subtitle1">{description}</Typography>
-            </div>
-        )
+
+            )
+        } else {
+            return (
+                <div style={nameLocationContainer}>
+                    <Typography variant="h4">{name}</Typography>
+                    <TextField
+                        id="outlined-textarea"
+                        label="Location"
+                        placeholder="City, State"
+                        multiline
+                        margin="normal"
+                        variant="outlined"
+                        defaultValue={location}
+                        onChange={this.handleFieldChange("Location")}
+                    />
+                    <TextField
+                        id="outlined-textarea"
+                        label="Description"
+                        placeholder="Tell your TravelFam about yourself..."
+                        multiline
+                        margin="normal"
+                        variant="outlined"
+                        defaultValue={description}
+                        onChange={this.handleFieldChange("Description")}
+                    />
+                </div>
+
+            )
+        }
     }
 
     //<img style={editButtonLogoStyle} src={editButton} alt="Edit"/>
     profileButtons() {
-        return (
-            <div>
-                <Button style={buttonStyle} variant="contained" color="secondary" onClick={() => alert('bork')}>
-                    Edit Profile
-                </Button>
-                <Button style={buttonStyle} variant="contained" color="primary" onClick={() => alert('save')}>
-                    Save Changes
-                </Button>
-                <Button style={buttonStyle} variant="contained" color="secondary">Vouch</Button>
-                <Button style={buttonStyle} variant="contained" color="primary">Message</Button>
-            </div>
-        )
+        if (this.state.displayState === "ViewSelf") {
+            return (
+                <div>
+                    <Button style={buttonStyle} variant="contained" color="secondary" onClick={() => this.setState({displayState: "EditSelf"})}>
+                        Edit Profile
+                    </Button>
+                </div>
+            )
+        } else if (this.state.displayState === "EditSelf") {
+            return (
+                <div>
+                    <Button style={buttonStyle} variant="contained" color="primary" onClick={this.resolveSaveChanges}>
+                        Save Changes
+                    </Button>
+                </div>
+            )
+        } else { //viewother
+            return (
+                <div>
+                    <Button style={buttonStyle} variant="contained" color="secondary">Vouch</Button>
+                    <Button style={buttonStyle} variant="contained" color="primary">Message</Button>
+                </div>
+            )
+        }
     }
 
     render() {
@@ -269,96 +317,6 @@ class ProfileView extends React.Component {
                 </div>
             </div>
         )
-
-
-        if (this.state.editState === false) {
-            return(
-                <div>
-
-
-
-                    <div style={parentDiv}>
-                        <div id="profile" style={containerStyle}>
-
-                            <div style={profilePictureBorder}>
-                                {/* user profile picture here */}
-                            </div>
-
-                            <div style={nameLocationContainer}>
-                                <Typography variant="h4">Name {this.props.currentUser.displayName}</Typography>
-                                <p style={locationStyle}>{this.state.locationText}</p>
-                                <button style={editButtonStyle} onClick={() => {
-                                    this.setState({editState: true, hideDescribeText: true})
-                                }}><img style={editButtonLogoStyle} src={editButton} alt="Edit"/> Edit Profile</button>
-                            </div>
-
-                            <div id="describe" style={describeContainer}>{this.props.currentUser.describeText}</div>
-
-                            <Button style={buttonStyle} variant="contained" color="secondary">
-                                //ICON
-                                EDIT
-                            </Button>
-                            <Button style={buttonStyle} variant="contained" color="secondary">Vouch</Button>
-                            <Button style={buttonStyle} variant="contained" color="primary">Message</Button>
-
-                            {/* <div style={footerButtonGroup}>
-                                <button style={footerButtonStyle}><img style={footerLogoStyle} src={instagramLogo} alt="instagram"></img></button>
-                                <button style={footerButtonStyle}><img style={footerLogoStyle} src={facebookLogo} alt="facebook"></img></button>
-                                <button style={footerButtonStyle}><img style={footerLogoStyle} src={snapchatLogo} alt="snapchat"></img></button>
-                                <button style={footerButtonStyle}><img style={footerLogoStyle} src={twitterLogo} alt="twitter"></img></button>
-                                <button style={footerButtonStyle}><img style={footerLogoStyle} src={linkedinLogo} alt="linkedin"></img></button>
-                            </div> */}
-                        </div>
-                    </div>
-                </div>
-            )
-        } else {
-            return (
-                <div>
-                    <AppNavBar
-                        segueToView = {this.props.segueToView}
-                    ></AppNavBar>
-
-                    <div style={parentDiv}>
-                        <div id="profile" style={containerStyle}>
-
-                            <div style={profilePictureBorder}>
-                                {/* user profile picture here */}
-                            </div>
-
-                            <div style={nameLocationContainer}>
-                                <h1 style={nameStyle}>Travelfam Bot</h1>
-
-                            </div>
-
-                            <div style={describeContainer}></div>
-                            <div style={textAreaContainer}>
-                                <input id="newLocationText" placeholder="City, State..." style={editViewLocationTextStyle} onChange={this.handleLocationChange}></input>
-                                <textarea id="newDescribeText" placeholder="Introduce yourself..." style={editViewDescribeTextStyle} onChange={this.handleDescribeChange}></textarea>
-                            </div>
-
-                            {/* <div style={editViewSocialMedia}>
-                                <div style={editViewSmButtonStyle}><img style={footerLogoStyle} src={instagramLogo} alt="instagram"></img><Switch>Link</Switch></div>
-                                <div style={editViewSmButtonStyle}><img style={footerLogoStyle} src={facebookLogo} alt="facebook"></img></div>
-                                <div style={editViewSmButtonStyle}><img style={footerLogoStyle} src={snapchatLogo} alt="snapchat"></img></div>
-                                <div style={editViewSmButtonStyle}><img style={footerLogoStyle} src={twitterLogo} alt="twitter"></img></div>
-                                <div style={editViewSmButtonStyle}><img style={footerLogoStyle} src={linkedinLogo} alt="linkedin"></img></div>
-                            </div> */}
-
-
-                            <Button style={updateButtonStyle} variant="contained" color="secondary" onClick={() => {
-                                this.setState({
-                                    editState: false, hideDescribeText: false,
-                                    })
-                            }}>Update Profile</Button>
-
-
-
-                        </div>
-                    </div>
-                </div>
-            )
-        }
     }
 }
 
