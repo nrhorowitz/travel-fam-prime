@@ -6,8 +6,13 @@ import AppNavBar from './components/AppNavBar.js';
 import ContentContainer from './components/ContentContainer.js';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
+import Box from '@material-ui/core/Box';
+import ReactUploadFile from 'react-upload-file';
+import ImageChooseButton from './components/ImageChooseButton.js';
+import UploadForm from './components/UploadForm.js';
 
 import '../css/App.css';
+import axios, { post} from 'axios';
 
 const facebookLogo = require('../img/facebook.svg');
 const instagramLogo = require('../img/instagram.svg');
@@ -66,7 +71,8 @@ const nameLocationContainer = {
     display: "table",
     textAlign: "center",
     lineHeight: "0.5",
-    marginBottom: "20px"
+    marginBottom: "20px",
+    minHeight: "380px"
 }
 const nameStyle = {
     fontSize: "25px",
@@ -153,6 +159,13 @@ const editViewSmButtonStyle = {
     cursor: "pointer",
     marginBottom: "10px"
 }
+const bottomBox = {
+    flex: 1,
+    justifyContent: 'flex-end',
+    marginBottom: 36
+}
+const uuidv1 = require('uuid/v1');
+
 class ProfileView extends React.Component {
     constructor(props) {
         super(props);
@@ -162,7 +175,8 @@ class ProfileView extends React.Component {
             descriptionText: "",
             hideDescribeText: false,
             editState: false,
-            displayState: "ViewOther" //ViewOther
+            displayState: "ViewOther",
+            imageUrl: "default-profile-image.png"
         }
         console.log(this.props.firebase.auth().currentUser);
 
@@ -171,9 +185,12 @@ class ProfileView extends React.Component {
         this.profileButtons = this.profileButtons.bind(this);
         this.handleFieldChange = this.handleFieldChange.bind(this);
         this.resolveSaveChanges = this.resolveSaveChanges.bind(this);
+        this.pullImage = this.pullImage.bind(this);
+        this.onFileUpload = this.onFileUpload.bind(this);
     }
 
     componentDidMount() {
+        this.pullImage();
         if (this.props.firebase.auth().currentUser.uid === this.props.viewId) {
             this.setState({displayState: "ViewSelf"});
         } else {
@@ -185,12 +202,54 @@ class ProfileView extends React.Component {
         this.props.segueToView(direction)
     }
 
+    pullImage() {
+        var profileRef = this.props.firebase.storage().ref().child('images/profile/' + this.props.viewId + "/" + this.state.imageUrl);
+        // Get the download URL
+        profileRef.getDownloadURL().then((url) => {
+            // Insert url into an <img> tag to "download"
+            console.log(url);
+            this.setState({imageUrl: url});
+        }).catch((error) => {
+            // A full list of error codes is available at
+            // https://firebase.google.com/docs/storage/web/handle-errors
+            switch (error.code) {
+                case 'storage/object-not-found':
+                    // File doesn't exist
+                    break;
+                case 'storage/unauthorized':
+                    // User doesn't have permission to access the object
+                    break;
+                case 'storage/canceled':
+                    // User canceled the upload
+                    break;
+                case 'storage/unknown':
+                    // Unknown error occurred, inspect the server response
+                    break;
+            }
+        });
+    }
+
     profileHeader() {
-        return (
-            <div style={profilePictureBorder}>
-                {/* user profile picture here */}
-            </div>
-        )
+        if (this.state.displayState === "EditSelf") {
+            return (
+                <div>
+                    <div style={profilePictureBorder}>
+                        <img src={this.state.imageUrl} width="150px" height="150px"></img>
+                    </div>
+                    <div>
+                        <input type="file" name="file" onChange={(e)=>this.onFileUpload(e)} />
+                    </div>
+                </div>
+            )
+        } else {
+            return (
+                <div>
+                    <div style={profilePictureBorder}>
+                        <img src={this.state.imageUrl} width="150px" height="150px"></img>
+                    </div>
+                </div>
+            )
+        }
     }
 
     handleFieldChange(label) {
@@ -207,7 +266,13 @@ class ProfileView extends React.Component {
         var name = displayArray[0];
         var location = displayArray[1];
         var description = displayArray[2];
-        var newDisplayName = name + "/" + this.state.locationText + "/" + this.state.descriptionText;
+        if (this.state.locationText.length > 0) {
+            location = this.state.locationText;
+        }
+        if (this.state.descriptionText.length > 0) {
+            description = this.state.descriptionText;
+        }
+        var newDisplayName = name + "/" + location + "/" + description;
         //TODO (maybe) loading circle for changes to profile
         this.props.firebase.auth().currentUser.updateProfile({
             displayName: newDisplayName,
@@ -217,6 +282,31 @@ class ProfileView extends React.Component {
         }).catch((error) => {
             // An error happened.
         });
+    }
+
+    onFileUpload(e) {
+        let files = e.target.files;
+        let reader = new FileReader();
+        var file = files[0]; // use the Blob or File API
+        var id = uuidv1();
+        this.props.firebase.storage().ref().child("images/profile/" + this.props.viewId + "/" + id).put(file).then((snapshot) => {
+            this.setState({imageUrl: id});
+            console.log('Uploaded a blob or file!');
+            this.componentDidMount();
+        });
+
+        /*
+        reader.readAsDataURL(files[0]);
+        reader.onload=(e)=>{
+            const url = "http://localhost:3000/";
+            var formData = {file:e.target.result};
+
+            console.log(typeof files[0]);
+
+
+            //var realFile = post(url, formData).then(response => console.warn('result', response));
+            //console.log(realFile);
+        }*/
     }
 
     profileText() {
@@ -267,15 +357,15 @@ class ProfileView extends React.Component {
     profileButtons() {
         if (this.state.displayState === "ViewSelf") {
             return (
-                <div>
+                <Box alignSelf="flex-end">
                     <Button style={buttonStyle} variant="contained" color="secondary" onClick={() => this.setState({displayState: "EditSelf"})}>
                         Edit Profile
                     </Button>
-                </div>
+                </Box>
             )
         } else if (this.state.displayState === "EditSelf") {
             return (
-                <div>
+                <div class="align-self-end">
                     <Button style={buttonStyle} variant="contained" color="primary" onClick={this.resolveSaveChanges}>
                         Save Changes
                     </Button>
@@ -304,19 +394,32 @@ class ProfileView extends React.Component {
             fontSize: "14px"
         }
 
-        return (
-            <div style={parentDiv}>
-                <AppNavBar
-                    segueToView = {this.props.segueToView}
-                ></AppNavBar>
-                <div id="profile" style={containerStyle}>
-                    {this.props.viewId}
-                    {this.profileHeader()}
-                    {this.profileText()}
-                    {this.profileButtons()}
+        if (this.state.imageUrl.length === 0) {
+            return (
+                <div style={parentDiv}>
+                    <AppNavBar
+                        segueToView = {this.props.segueToView}
+                    ></AppNavBar>
+                    <div>
+                        TODO: LOADING CIRCLE
+                    </div>
                 </div>
-            </div>
-        )
+            )
+        } else {
+            return (
+                <div style={parentDiv}>
+                    <AppNavBar
+                        segueToView = {this.props.segueToView}
+                    ></AppNavBar>
+                    <div id="profile" style={containerStyle}>
+                        {this.props.viewId}
+                        {this.profileHeader()}
+                        {this.profileText()}
+                        {this.profileButtons()}
+                    </div>
+                </div>
+            )
+        }
     }
 }
 
