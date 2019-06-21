@@ -101,9 +101,8 @@ class App extends Component {
             phone: user.phoneNumber,
             email: email,
             firstName: firstName,
-            lastName: lastName
-
-            //"credential": user.c
+            lastName: lastName,
+            imageUrl: "default-profile-image.png"
         }).catch(function(error) {
             console.error("Error writing document: ", error);
         });

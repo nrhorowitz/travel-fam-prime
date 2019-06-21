@@ -203,29 +203,46 @@ class ProfileView extends React.Component {
     }
 
     pullImage() {
-        var profileRef = this.props.firebase.storage().ref().child('images/profile/' + this.props.viewId + "/" + this.state.imageUrl);
-        // Get the download URL
-        profileRef.getDownloadURL().then((url) => {
-            // Insert url into an <img> tag to "download"
-            console.log(url);
-            this.setState({imageUrl: url});
-        }).catch((error) => {
-            // A full list of error codes is available at
-            // https://firebase.google.com/docs/storage/web/handle-errors
-            switch (error.code) {
-                case 'storage/object-not-found':
-                    // File doesn't exist
-                    break;
-                case 'storage/unauthorized':
-                    // User doesn't have permission to access the object
-                    break;
-                case 'storage/canceled':
-                    // User canceled the upload
-                    break;
-                case 'storage/unknown':
-                    // Unknown error occurred, inspect the server response
-                    break;
+        //pull from public database, then take that image and display
+        console.log(this.props.viewId);
+        this.props.firebase.firestore().collection('users').doc(this.props.viewId).get().then((snapshot) => {
+            this.setState({imageUrl: snapshot.data().imageUrl});
+        }).then(()=>{
+            var profilePath = "";
+            if (this.state.imageUrl === "default-profile-image.png") {
+                profilePath = 'images/default/default-profile-image.png';
+            } else {
+                profilePath = 'images/profile/' + this.props.viewId + "/" + this.state.imageUrl;
             }
+            console.log(profilePath);
+            //console.log('images/profile/' + this.props.viewId + "/" + this.state.imageUrl);
+            var profileRef = this.props.firebase.storage().ref().child(profilePath);
+            // Get the download URL
+            profileRef.getDownloadURL().then((url) => {
+                // Insert url into an <img> tag to "download"
+                console.log(url);
+                this.setState({imageUrl: url});
+            }).catch((error) => {
+                //console.log('error')
+                // A full list of error codes is available at
+                // https://firebase.google.com/docs/storage/web/handle-errors
+                switch (error.code) {
+                    case 'storage/object-not-found':
+                        // File doesn't exist
+                        break;
+                    case 'storage/unauthorized':
+                        // User doesn't have permission to access the object
+                        break;
+                    case 'storage/canceled':
+                        // User canceled the upload
+                        break;
+                    case 'storage/unknown':
+                        // Unknown error occurred, inspect the server response
+                        break;
+                }
+            });
+        }).catch((err) => {
+            console.log('Error getting documents', err);
         });
     }
 
@@ -282,6 +299,14 @@ class ProfileView extends React.Component {
         }).catch((error) => {
             // An error happened.
         });
+        console.log(this.state.imageUrl);
+        this.props.firebase.firestore().collection('users').doc(this.props.viewId).update({
+            imageUrl: this.state.imageUrl
+        }).then(() => {
+            return;
+        }).catch(function(error) {
+            console.error("Error writing document: ", error);
+        });
     }
 
     onFileUpload(e) {
@@ -295,18 +320,13 @@ class ProfileView extends React.Component {
             this.componentDidMount();
         });
 
-        /*
-        reader.readAsDataURL(files[0]);
-        reader.onload=(e)=>{
-            const url = "http://localhost:3000/";
-            var formData = {file:e.target.result};
-
-            console.log(typeof files[0]);
-
-
-            //var realFile = post(url, formData).then(response => console.warn('result', response));
-            //console.log(realFile);
-        }*/
+        this.props.firebase.firestore().collection('users').doc(this.props.viewId).update({
+            imageUrl: id
+        }).then(() => {
+            return;
+        }).catch(function(error) {
+            console.error("Error writing document: ", error);
+        });
     }
 
     profileText() {
