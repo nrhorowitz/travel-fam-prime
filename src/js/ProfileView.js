@@ -418,7 +418,9 @@ class ProfileView extends React.Component {
             return (
                 <div style={parentDiv}>
                     <AppNavBar
+                        currentUser = {this.props.firebase.auth().currentUser}
                         segueToView = {this.props.segueToView}
+                        setViewId = {this.props.setViewId}
                     ></AppNavBar>
                     <div>
                         TODO: LOADING CIRCLE
@@ -429,7 +431,9 @@ class ProfileView extends React.Component {
             return (
                 <div style={parentDiv}>
                     <AppNavBar
+                        currentUser = {this.props.firebase.auth().currentUser}
                         segueToView = {this.props.segueToView}
+                        setViewId = {this.props.setViewId}
                     ></AppNavBar>
                     <div id="profile" style={containerStyle}>
                         {this.props.viewId}

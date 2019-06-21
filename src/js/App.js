@@ -211,6 +211,8 @@ class App extends Component {
                     segueToView = {this.segueToView}
                     firebase = {firebase}
                     viewId = {this.state.viewId}
+                    currentUser = {firebase.auth().currentUser}
+                    setViewId = {this.setViewId}
                 >
                 </ProfileView>
             )
