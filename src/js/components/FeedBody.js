@@ -147,7 +147,7 @@ class FeedBody extends Component {
         var currentDate = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
         var currentTime = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
         currentRef.collection("reply").add({
-            id: '0RHvET4AUXlPGr3Ug921',
+            id: this.props.firebase.auth().currentUser.uid,
             message: input,
             replies: 0,
             creationDate: currentDate + "/" + currentTime,
@@ -368,7 +368,7 @@ class FeedBody extends Component {
                         var currentTime = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
                         if (input !== '') {
                             this.props.db.collection("category").doc(this.props.category).collection(this.props.channel).add({
-                                id: '0RHvET4AUXlPGr3Ug921',
+                                id: this.props.firebase.auth().currentUser.uid,
                                 message: input,
                                 replies: 0,
                                 creationDate: currentDate + "/" + currentTime,

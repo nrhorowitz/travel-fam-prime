@@ -4,7 +4,7 @@ import '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import { flexbox } from '@material-ui/system';
 
-const logo = require('../../img/Logo3.png');
+var logo = require('../../img/Logo3.png');
 const useStyles = makeStyles(theme => ({
 
     profilePicture: {
@@ -59,6 +59,8 @@ export default function AccountTag(props) {
         if ((map.firstName !== undefined) && (map.lastName !== undefined)) {
             name = map.firstName + " " + map.lastName;
         }
+        logo = props.userMap.get(props.id).imageUrl;
+        console.log(logo);
     } else {
 
     }
@@ -66,6 +68,7 @@ export default function AccountTag(props) {
     if ((props.data !== undefined) && (props.data.date !== undefined)) {
         time = "Berkeley, CA - " + props.data.date;
     }
+    console.log(logo);
     return (
         <div>
             <div style={{alignItems: "center", marginBottom: "30px"}}>

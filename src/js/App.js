@@ -259,6 +259,7 @@ class App extends Component {
                     db = {db}
                     currentUser = {firebase.auth().currentUser}
                     setViewId = {this.setViewId}
+                    firebase = {firebase}
                 />
             )
         } else if (this.state.currentView === "SMSVerificationView") {

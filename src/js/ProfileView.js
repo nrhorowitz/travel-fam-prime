@@ -176,7 +176,8 @@ class ProfileView extends React.Component {
             hideDescribeText: false,
             editState: false,
             displayState: "ViewOther",
-            imageUrl: "default-profile-image.png"
+            imageUrl: "default-profile-image.png",
+            image: ""
         }
         console.log(this.props.firebase.auth().currentUser);
 
@@ -221,7 +222,7 @@ class ProfileView extends React.Component {
             profileRef.getDownloadURL().then((url) => {
                 // Insert url into an <img> tag to "download"
                 console.log(url);
-                this.setState({imageUrl: url});
+                this.setState({image: url});
             }).catch((error) => {
                 //console.log('error')
                 // A full list of error codes is available at
@@ -251,7 +252,7 @@ class ProfileView extends React.Component {
             return (
                 <div>
                     <div style={profilePictureBorder}>
-                        <img src={this.state.imageUrl} width="150px" height="150px"></img>
+                        <img src={this.state.image} width="150px" height="150px"></img>
                     </div>
                     <div>
                         <input type="file" name="file" onChange={(e)=>this.onFileUpload(e)} />
@@ -262,7 +263,7 @@ class ProfileView extends React.Component {
             return (
                 <div>
                     <div style={profilePictureBorder}>
-                        <img src={this.state.imageUrl} width="150px" height="150px"></img>
+                        <img src={this.state.image} width="150px" height="150px"></img>
                     </div>
                 </div>
             )
@@ -299,6 +300,7 @@ class ProfileView extends React.Component {
         }).catch((error) => {
             // An error happened.
         });
+        /*
         console.log(this.state.imageUrl);
         this.props.firebase.firestore().collection('users').doc(this.props.viewId).update({
             imageUrl: this.state.imageUrl
@@ -306,7 +308,7 @@ class ProfileView extends React.Component {
             return;
         }).catch(function(error) {
             console.error("Error writing document: ", error);
-        });
+        });*/
     }
 
     onFileUpload(e) {

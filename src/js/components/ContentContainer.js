@@ -86,6 +86,7 @@ export default function ContentContainer(props) {
                         category = {props.category}
                         channel = {props.channel}
                         channelMap = {props.channelMap}
+                        firebase = {props.firebase}
                     ></FeedBody>
 
                 </div>
