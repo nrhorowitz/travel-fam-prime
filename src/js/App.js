@@ -91,7 +91,6 @@ class App extends Component {
     }
 
     setNewUser(user, credential, email, firstName, lastName) {
-        alert(firebase.currentUser);
         console.log("setnewuser's credential here")
         console.log(credential);
         console.log(user.password);

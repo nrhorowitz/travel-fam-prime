@@ -4,6 +4,12 @@ import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import DashBoardView from './DashBoardView.js';
 import PhoneInput from 'react-phone-number-input';
+
+import IconButton from '@material-ui/core/IconButton';
+import InputAdornment from '@material-ui/core/InputAdornment';
+import MenuItem from '@material-ui/core/MenuItem';
+import Visibility from '@material-ui/icons/Visibility';
+import VisibilityOff from '@material-ui/icons/VisibilityOff';
 // import 'react-phone-number-input/react-responsive-ui';
 import 'react-phone-number-input/style.css'
 import firebase from '../config/Fire';
@@ -113,12 +119,7 @@ const fieldsetStyle = {
 }
 
 var handleSignedInUser = function(user, credential, email, firstName, lastName) {
-  console.log("this is the user");
-  console.log(user);
-  console.log("this is the credential from handleSignedInUser");
-  console.log(credential);
   globalProps.setNewUser(user, credential, email, firstName, lastName);
-  console.log(firebase.currentUser);
   firebase.auth().currentUser.updateProfile({
       displayName: firstName + " " + lastName + "/(default location)/(default description)",
       photoURL: "https://example.com/jane-q-user/profile.jpg"
@@ -143,17 +144,21 @@ class SignUpView extends Component {
   constructor(props) {
     super(props);
     globalProps = props;
-    this.state = {hideCongrats: false,
-                  hideSMS: false,
-                  step: 1,
-                  pNum: '',
-                  smsCode: '',
-                  firstName: '',
-                  lastName: '',
-                  email: '',
-                  password: '',
-                  credential: '',
-                  user: ''};
+    this.state = {
+        hideCongrats: false,
+        hideSMS: false,
+        step: 1,
+        pNum: '',
+        smsCode: '',
+        firstName: '',
+        lastName: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+        credential: '',
+        user: '',
+        incorrectPassword: false
+    };
 
     this.handleStepChange = this.handleStepChange.bind(this);
     this.handleChange = this.handleChange.bind(this);
@@ -162,15 +167,20 @@ class SignUpView extends Component {
     this.handleLastNameChange = this.handleLastNameChange.bind(this);
     this.handleEmailChange = this.handleEmailChange.bind(this);
     this.handlePasswordChange = this.handlePasswordChange.bind(this);
+    this.handleConfirmPasswordChange = this.handleConfirmPasswordChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.onSignUpSubmit = this.onSignUpSubmit.bind(this);
     // this.register = this.register.bind(this);
     this.verify = this.verify.bind(this);
+    this.changePasswordVisibility = this.changePasswordVisibility.bind(this);
   }
 
   handleStepChange() {
+      if ((this.state.step == 5) && (this.state.password !== this.state.confirmPassword)) {
+          this.setState({incorrectPassword: true});
+          return;
+      }
     var step = this.state.step + 1;
-    console.log(step);
 
     if (step == 2) {
       this.setState({hideCongrats: false});
@@ -217,12 +227,19 @@ class SignUpView extends Component {
     this.setState({password: event.target.value});
   }
 
+  handleConfirmPasswordChange(event) {
+    this.setState({confirmPassword: event.target.value});
+  }
+
   //prevents screen flash on form submission
   handleSubmit(event) {
     event.preventDefault();
   }
 
-
+  changePasswordVisibility() {
+      const newShowPassword = !(this.state.showPassword);
+      this.setState({showPassword: newShowPassword});
+  }
 
 
   //initializes recaptcha and sends sms to phone number
@@ -232,7 +249,6 @@ class SignUpView extends Component {
     this.setState({hideSMS: false});
 
     var phoneNum = this.state.pNum;
-    console.log(phoneNum);
     document.getElementById("phoneNumPrompt").innerHTML = "Please enter the 6-digit code we just texted to " + phoneNum;
 
     var appVerifier = new firebase.auth.RecaptchaVerifier("recaptchaContainer", {'size':'invisible'});
@@ -258,16 +274,11 @@ class SignUpView extends Component {
     if (smsCode) {
 
       //this creates a credential even if the user doesn't sign in correctly.
-
-      console.log("this is confirmationRESULT")
-      console.log(confirmationResult);
       //signs the user in with the smsCode.
       confirmationResult.confirm(smsCode).then(function (result) {
         console.log("Successful login!")
         var credential = firebase.auth.PhoneAuthProvider.credential(confirmationResult.verificationId, smsCode);
         // firebase.auth().signInWithCredential(credential);
-        // console.log("yeet")
-        // console.log(credential);
         var user = result.user;
 
         //user and credential are being updated to state here
@@ -281,6 +292,57 @@ class SignUpView extends Component {
 
       });
     }
+
+  }
+
+  renderPassword() {
+      if (this.state.incorrectPassword) {
+          return (
+              <div>
+                  <TextField
+                      error
+                      style={inputStyle}
+                      variant="outlined"
+                      label="Password"
+                      value={this.state.password}
+                      onChange={this.handlePasswordChange}
+                      type="password"
+                  />
+                  <TextField
+                      error
+                      style={inputStyle}
+                      variant="outlined"
+                      label="Password"
+                      value={this.state.confirmPassword}
+                      onChange={this.handleConfirmPasswordChange}
+                      type="password"
+                  />
+              </div>
+          )
+      } else {
+          return (
+              <div>
+                  <TextField
+                      style={inputStyle}
+                      variant="outlined"
+                      label="Password"
+                      value={this.state.password}
+                      onChange={this.handlePasswordChange}
+                      type="password"
+                  />
+                  <TextField
+                      style={inputStyle}
+                      variant="outlined"
+                      label="Password"
+                      value={this.state.confirmPassword}
+                      onChange={this.handleConfirmPasswordChange}
+                      type="password"
+                  />
+              </div>
+          )
+      }
+
+
 
   }
 
@@ -332,7 +394,6 @@ class SignUpView extends Component {
     // if (this.state.hideSMS) {
     //   smsStepStyle.display = "none";
     // }
-
 
 
 
@@ -410,8 +471,7 @@ class SignUpView extends Component {
           <fieldset id="passwordStep" style={fieldsetStyle}>
             <button style={backArrowButtonStyle}><img src={backArrow} style={backArrowStyle} alt="backArrow" /></button>
             <h1 style={headerThreeStyle}>Last step...Create a password</h1>
-
-            <TextField style={inputStyle} variant="outlined" label="Password" value={this.state.password} onChange={this.handlePasswordChange} />
+            {this.renderPassword()}
             <Button style={buttonStyle} variant="contained" color="secondary" type="submit" onClick={this.handleStepChange}>Complete</Button>
           </fieldset>
         </div>
