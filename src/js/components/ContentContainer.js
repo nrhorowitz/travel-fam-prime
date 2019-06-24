@@ -87,6 +87,8 @@ export default function ContentContainer(props) {
                         channel = {props.channel}
                         channelMap = {props.channelMap}
                         firebase = {props.firebase}
+                        segueToView = {props.segueToView}
+                        setViewId = {props.setViewId}
                     ></FeedBody>
 
                 </div>

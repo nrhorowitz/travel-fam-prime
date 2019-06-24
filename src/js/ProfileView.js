@@ -339,7 +339,7 @@ class ProfileView extends React.Component {
         var name = displayArray[0];
         var location = displayArray[1];
         var description = displayArray[2];
-        if (this.state.displayState === "ViewSelf") {
+        if ((this.state.displayState === "ViewSelf") || (this.state.displayState === "ViewOther")) {
             return (
                 <div style={nameLocationContainer}>
                     <Typography variant="h4">{name}</Typography>

@@ -93,6 +93,8 @@ class DashBoardView extends React.Component {
                         changeCategory = {this.changeCategory}
                         changeChannel = {this.changeChannel}
                         firebase = {this.props.firebase}
+                        segueToView = {this.props.segueToView}
+                        setViewId = {this.props.setViewId}
                     ></ContentContainer>
                 </div>
             )

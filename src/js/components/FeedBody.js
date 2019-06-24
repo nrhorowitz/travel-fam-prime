@@ -315,7 +315,13 @@ class FeedBody extends Component {
         return (
             <ListItem style={postedBox}>
                 <div style={{marginBottom: "70px"}}>
-                    <AccountTag id={data.id} userMap={this.state.userMap} data={data}></AccountTag>
+                    <AccountTag
+                        id={data.id}
+                        userMap={this.state.userMap}
+                        data={data}
+                        segueToView = {this.props.segueToView}
+                        setViewId = {this.props.setViewId}
+                    ></AccountTag>
                     <div id="outputPost" style={outputPost}>
                         {data.message}
                     </div>

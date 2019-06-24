@@ -102,7 +102,7 @@ function AppNavBar(props) {
       if (path === "ProfileView") {
           props.setViewId(props.currentUser.uid);
       }
-      props.segueToView(path);
+      props.segueToView(path, true);
   }
 
   function handleMobileMenuOpen(event) {

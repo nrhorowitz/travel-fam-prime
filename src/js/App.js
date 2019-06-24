@@ -69,8 +69,13 @@ class App extends Component {
     //     this.listener();
     // }
 
-    segueToView(direction) {
-        this.setState({currentView: direction});
+    segueToView(direction, forceUpdate=false) {
+        if (forceUpdate) {
+            this.setState({currentView: direction});
+            //this.forceUpdate();
+        } else {
+            this.setState({currentView: direction});
+        }
     }
 
     addNewUserInfo(pair) {
