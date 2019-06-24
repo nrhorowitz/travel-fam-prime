@@ -57,6 +57,7 @@ function refreshData() {
     alert('refresh');
 }
 
+//  <GenreSideBar style={{ marginTop: "20px"}}></GenreSideBar>
 export default function ContentContainer(props) {
     const classes = useStyles();
     return (
@@ -64,7 +65,6 @@ export default function ContentContainer(props) {
             <div className={classes.wrapper}>
 
                 <div className={classes.rowSideBar}>
-                    <GenreSideBar style={{ marginTop: "20px"}}></GenreSideBar>
                     <NetworkSideBar
                         style={{ marginTop: "20px"}}
                         db = {props.db}

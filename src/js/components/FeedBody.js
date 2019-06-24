@@ -174,9 +174,7 @@ class FeedBody extends Component {
     }
 
     pullFromDatabase(items, content, prefixPath) {
-        console.log('call');
         if (content === "users") {
-            console.log('users');
             this.props.db.collection("users").get().then(querySnapshot => {
                 var userMap = new Map();
                 querySnapshot.forEach(doc => {
@@ -210,7 +208,6 @@ class FeedBody extends Component {
                 itemsRef = itemsRef.items;
             }
             currentRef.get().then(querySnapshot => {
-                console.log(querySnapshot);
                 querySnapshot.forEach(doc => {
                     // doc.data() is never undefined for query doc snapshots
                     //console.log(doc.id, " => ", doc.data());

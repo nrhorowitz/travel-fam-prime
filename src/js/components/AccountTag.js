@@ -65,7 +65,6 @@ export default function AccountTag(props) {
             name = map.firstName + " " + map.lastName;
         }
         logo = props.userMap.get(props.id).rawImage;
-        console.log(logo);
     } else {
 
     }
@@ -73,7 +72,6 @@ export default function AccountTag(props) {
     if ((props.data !== undefined) && (props.data.date !== undefined)) {
         time = "Berkeley, CA - " + props.data.date;
     }
-    console.log(logo);
     return (
         <div>
             <div style={{alignItems: "center", marginBottom: "30px"}}>
