@@ -59,7 +59,7 @@ export default function AccountTag(props) {
         if ((map.firstName !== undefined) && (map.lastName !== undefined)) {
             name = map.firstName + " " + map.lastName;
         }
-        logo = props.userMap.get(props.id).imageUrl;
+        logo = props.userMap.get(props.id).rawImage;
         console.log(logo);
     } else {
 

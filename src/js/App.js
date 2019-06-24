@@ -102,7 +102,8 @@ class App extends Component {
             email: email,
             firstName: firstName,
             lastName: lastName,
-            imageUrl: "default-profile-image.png"
+            imageUrl: "default-profile-image.png",
+            rawImage: "https://firebasestorage.googleapis.com/v0/b/travelfamprime.appspot.com/o/images%2Fdefault%2Fdefault-profile-image.png?alt=media&token=dcbab95f-7953-47bf-9cb9-548211a78a75"
         }).catch(function(error) {
             console.error("Error writing document: ", error);
         });

@@ -223,6 +223,9 @@ class ProfileView extends React.Component {
                 // Insert url into an <img> tag to "download"
                 console.log(url);
                 this.setState({image: url});
+                this.props.firebase.firestore().collection('users').doc(this.props.viewId).update({
+                    rawImage: url
+                })
             }).catch((error) => {
                 //console.log('error')
                 // A full list of error codes is available at
