@@ -367,11 +367,15 @@ class SignUpView extends Component {
       width: "350px",
       height: "600px",
     };
-    const smsStepStyle = this.state.hideSMS ? {
-      display: 'none',
-
+    const smsWrapper = this.state.hideSMS ? {
+        visible: 'false',
+        display: 'none'
     } : {
-
+        visible: 'true',
+    };
+    const smsStepStyle = false ? {
+      display: 'none'
+    } : {
       background: "rgba(0,0,0,0)",
 
       border: "0 none",
@@ -428,13 +432,14 @@ class SignUpView extends Component {
 
         {/* congratsStep fieldset gets hidden, smsCodeStep fieldstep gets shown */}
         {/* TODO: minor error: uncaught promise timeout happens because this fieldset gets removed. i think */}
-        <fieldset id="smsCodeStep" style={smsStepStyle}>
-          <button style={backArrowButtonStyle}><img src={backArrow} style={backArrowStyle} alt="backArrow" /></button>
-          <h1 style={headerTwoStyle} id="phoneNumPrompt"></h1>
-
-          <TextField style={inputStyle} variant="outlined" label="SMS Code" value={this.state.smsCode} onChange={this.handleCodeChange} />
-          <Button style={buttonStyle} variant="contained" color="secondary" type="submit" onClick={() => {this.verify(); this.handleStepChange()}} id="recaptchaContainer">Verify</Button>
-        </fieldset>
+        <div style={smsWrapper}>
+            <fieldset id="smsCodeStep" style={smsStepStyle}>
+                <button style={backArrowButtonStyle}><img src={backArrow} style={backArrowStyle} alt="backArrow" /></button>
+                <h1 style={headerTwoStyle} id="phoneNumPrompt"></h1>
+                <TextField style={inputStyle} label="SMS Code" variant="outlined" margin="normal" value={this.state.smsCode} onChange={this.handleCodeChange} />
+                <Button style={buttonStyle} variant="contained" color="secondary" type="submit" onClick={() => {this.verify(); this.handleStepChange()}} id="recaptchaContainer">Verify</Button>
+            </fieldset>
+        </div>
         </div>
       )
 
