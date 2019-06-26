@@ -178,12 +178,14 @@ class FeedBody extends Component {
         if (content === "users") {
             console.log('users');
             this.props.db.collection("users").get().then(querySnapshot => {
+                console.log("this is the querySnapshot", querySnapshot);
                 var userMap = new Map();
                 querySnapshot.forEach(doc => {
                     // doc.data() is never undefined for query doc snapshots
                     //console.log(doc.id, " => ", doc.data());
                     userMap.set(doc.id, doc.data());
                 });
+
                 this.setState({userMap: userMap});
             }).catch(err => {
                 console.log('Error getting document', err);
@@ -192,6 +194,7 @@ class FeedBody extends Component {
             var currentRef = this.props.db.collection("category");
             var pathArray = prefixPath.split("/");
             var itemsRef = this.state;
+            console.log("this is the itemsRef", itemsRef);
             if (items.length === 0) { //RESET IF FIRST
                 itemsRef.items = [];
             }
@@ -199,7 +202,10 @@ class FeedBody extends Component {
                 currentRef = currentRef.doc(pathArray[i]);
                 currentRef = currentRef.collection(pathArray[i + 1]);
                 for (var j = 0; j < itemsRef.length; j += 1) {
+                    console.log("this is the itemsRef[j].id", itemsRef[j].id);
+                    console.log("this is the pathArray[i]", pathArray[i])
                     if (itemsRef[j].id === pathArray[i]) {
+                        
                         itemsRef = itemsRef[j].data;
                         break;
                     }
