@@ -77,9 +77,14 @@ class DashBoardView extends React.Component {
                 </div>
             )
         } else {
+            console.log(this.props.currentUser);
             return(
                 <div>
-                    <AppNavBar></AppNavBar>
+                    <AppNavBar
+                        segueToView = {this.props.segueToView}
+                        setViewId = {this.props.setViewId}
+                        currentUser = {this.props.currentUser}
+                    ></AppNavBar>
                     <ContentContainer
                         db = {this.props.db}
                         category = {this.state.category}
@@ -87,6 +92,9 @@ class DashBoardView extends React.Component {
                         channelMap = {this.state.channelMap}
                         changeCategory = {this.changeCategory}
                         changeChannel = {this.changeChannel}
+                        firebase = {this.props.firebase}
+                        segueToView = {this.props.segueToView}
+                        setViewId = {this.props.setViewId}
                     ></ContentContainer>
                 </div>
             )

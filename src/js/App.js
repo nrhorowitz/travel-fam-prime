@@ -27,6 +27,7 @@ class App extends Component {
         this.state = {
             currentUserId: "",
             currentView: "LoadingPageView",
+            viewId: ""
         };
         this.segueToView = this.segueToView.bind(this);
         this.addNewUserInfo = this.addNewUserInfo.bind(this);
@@ -37,9 +38,25 @@ class App extends Component {
         this.updateViewToId = this.updateViewToId.bind(this);
 
         this.loginUser = this.loginUser.bind(this);
+        this.setViewId = this.setViewId.bind(this);
     }
 
     componentDidMount() {
+        console.log('APP COMPONENT RENDER');
+        firebase.auth().onAuthStateChanged((user) => {
+          if (user) {
+              //if ((user.displayName !== undefined) && (user.email !== undefined) && (user.password !== undefined)) {
+              if (user.displayName !== null) {
+                  this.segueToView("DashBoardView");
+              } else {
+                  this.segueToView("SignUpView");
+              }
+            // User is signed in.
+          } else {
+              this.segueToView("SignUpView");
+            // No user is signed in.
+          }
+        });
 
         // this.segueToView("LandingPageView");
         // this.segueToView("DashBoardView");
@@ -54,8 +71,13 @@ class App extends Component {
     //     this.listener();
     // }
 
-    segueToView(direction) {
-        this.setState({currentView: direction});
+    segueToView(direction, forceUpdate=false) {
+        if (forceUpdate) {
+            this.setState({currentView: direction});
+            //this.forceUpdate();
+        } else {
+            this.setState({currentView: direction});
+        }
     }
 
     addNewUserInfo(pair) {
@@ -71,7 +93,6 @@ class App extends Component {
     }
 
     setNewUser(user, credential, email, firstName, lastName) {
-        // alert(firebase.currentUser);
         console.log("setnewuser's credential here")
         console.log(credential);
         console.log(user.password);
@@ -86,9 +107,9 @@ class App extends Component {
             phone: user.phoneNumber,
             email: email,
             firstName: firstName,
-            lastName: lastName
-
-            //"credential": user.c
+            lastName: lastName,
+            imageUrl: "default-profile-image.png",
+            rawImage: "https://firebasestorage.googleapis.com/v0/b/travelfamprime.appspot.com/o/images%2Fdefault%2Fdefault-profile-image.png?alt=media&token=dcbab95f-7953-47bf-9cb9-548211a78a75"
         }).catch(function(error) {
             console.error("Error writing document: ", error);
         });
@@ -109,27 +130,28 @@ class App extends Component {
     setNewCredential(user, credential) {
         console.log("SETNEWTNOIW JSONCRED");
         console.log(credential);
-        
+
         //when reading credential from firebase, need to use JSON.parse(credential) to unparse it from JSON format
 
         // const cred = credential.map((obj) => {return Object.assign({}, obj)});
         db.collection('credentials').doc(user.phoneNumber).set({
-            credential: credential,
             password: user.password,
             userId: user.uid
-            
-            
-        }).catch(function(error) {
+
+
+        }).then(() => {
+            this.segueToView("DashBoardView");
+        }).catch(error => {
             console.error("Error storing credential and password: ", error);
         })
     }
 
     loginUser(phoneNumber, password) {
         // var cred = JSON.parse(jsonCred);
-        
+
         var docRef = db.collection("credentials").doc(phoneNumber);
         docRef.get().then(function(doc) {
-            if (doc.exists) { 
+            if (doc.exists) {
                 if (password === doc.data().password) {
                     this.state.currentUserId = doc.data().userId;
                     const cred = doc.data().credential
@@ -185,11 +207,20 @@ class App extends Component {
         }
     }
 
+    setViewId(id) {
+        this.setState({viewId: id});
+    }
+
     currentPage() {
         if (this.state.currentView === "ProfileView") {
             return (
-                <ProfileView segueToView = {this.segueToView}>
-
+                <ProfileView
+                    segueToView = {this.segueToView}
+                    firebase = {firebase}
+                    viewId = {this.state.viewId}
+                    currentUser = {firebase.auth().currentUser}
+                    setViewId = {this.setViewId}
+                >
                 </ProfileView>
             )
         } else if (this.state.currentView === "MessageBase") {
@@ -204,7 +235,7 @@ class App extends Component {
         
         else if (this.state.currentView === "LoginView"){
             return (
-                <LoginView 
+                <LoginView
                     segueToView = {this.segueToView}
                     firebase = {firebase}
                     loginUser = {this.loginUser}
@@ -243,6 +274,9 @@ class App extends Component {
                 <DashBoardView
                     segueToView = {this.segueToView}
                     db = {db}
+                    currentUser = {firebase.auth().currentUser}
+                    setViewId = {this.setViewId}
+                    firebase = {firebase}
                 />
             )
         } else if (this.state.currentView === "SMSVerificationView") {

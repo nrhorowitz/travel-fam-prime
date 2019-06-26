@@ -4,6 +4,12 @@ import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import DashBoardView from './DashBoardView.js';
 import PhoneInput from 'react-phone-number-input';
+
+import IconButton from '@material-ui/core/IconButton';
+import InputAdornment from '@material-ui/core/InputAdornment';
+import MenuItem from '@material-ui/core/MenuItem';
+import Visibility from '@material-ui/icons/Visibility';
+import VisibilityOff from '@material-ui/icons/VisibilityOff';
 // import 'react-phone-number-input/react-responsive-ui';
 import 'react-phone-number-input/style.css'
 import firebase from '../config/Fire';
@@ -48,7 +54,7 @@ const logoStyle = {
   display: "table",
   margin: "0 auto",
   marginTop: "50px"
-  
+
 }
 const headerOneStyle = {
   fontSize: "28px",
@@ -86,7 +92,7 @@ const inputStyle = {
   display: "table",
   margin: "0 auto",
   marginTop: "30px",
-  
+
 }
 
 const buttonStyle = {
@@ -102,25 +108,30 @@ const fieldsetStyle = {
   boxShadow: "0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 6px 10px 0 rgba(0, 0, 0, 0.19)",
   padding: "20px 30px",
   boxSizing: "border-box",
-  
+
   margin: "auto",
   position: "relative",
 
   width: "350px",
   height: "600px",
-  
+
 
 }
 
 var handleSignedInUser = function(user, credential, email, firstName, lastName) {
-  console.log("this is the user");
-  console.log(user);
-  console.log("this is the credential from handleSignedInUser");
-  console.log(credential);
   globalProps.setNewUser(user, credential, email, firstName, lastName);
-  // console.log(firebase.currentUser); 
+  firebase.auth().currentUser.updateProfile({
+      displayName: firstName + " " + lastName + "/(default location)/(default description)",
+      photoURL: "https://example.com/jane-q-user/profile.jpg"
+    }).then(function() {
+      // Update successful.
+      console.log(firebase.auth().currentUser);
+    }).catch(function(error) {
+      // An error happened.
+    });
   // console.log("ADNAKLALKSDNAKLDNLAKDNALKDASNKLALKNDALKD")
   // console.log("just added to firebase");
+
 }
 
 var settingState = function(user, credential) {
@@ -129,22 +140,26 @@ var settingState = function(user, credential) {
 }
 
 
-class SignUpView extends Component { 
+class SignUpView extends Component {
   constructor(props) {
     super(props);
     globalProps = props;
-    this.state = {hideCongrats: false, 
-                  hideSMS: false, 
-                  step: 1, 
-                  pNum: '', 
-                  smsCode: '', 
-                  firstName: '', 
-                  lastName: '', 
-                  email: '', 
-                  password: '', 
-                  credential: '',
-                  user: ''};
-    
+    this.state = {
+        hideCongrats: false,
+        hideSMS: false,
+        step: 1,
+        pNum: '',
+        smsCode: '',
+        firstName: '',
+        lastName: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+        credential: '',
+        user: '',
+        incorrectPassword: false
+    };
+
     this.handleStepChange = this.handleStepChange.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleCodeChange = this.handleCodeChange.bind(this);
@@ -152,26 +167,31 @@ class SignUpView extends Component {
     this.handleLastNameChange = this.handleLastNameChange.bind(this);
     this.handleEmailChange = this.handleEmailChange.bind(this);
     this.handlePasswordChange = this.handlePasswordChange.bind(this);
+    this.handleConfirmPasswordChange = this.handleConfirmPasswordChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.onSignUpSubmit = this.onSignUpSubmit.bind(this);
     // this.register = this.register.bind(this);
     this.verify = this.verify.bind(this);
+    this.changePasswordVisibility = this.changePasswordVisibility.bind(this);
   }
 
   handleStepChange() {
+      if ((this.state.step == 5) && (this.state.password !== this.state.confirmPassword)) {
+          this.setState({incorrectPassword: true});
+          return;
+      }
     var step = this.state.step + 1;
-    console.log(step);
 
     if (step == 2) {
       this.setState({hideCongrats: false});
       this.setState({hideSMS: true});
-      
+
     } else if (step == 3) {
       this.setState({hideCongrats: true});
       this.setState({hideSMS: false});
     } else if (step == 6) {
       var user = this.state.user;
-      var credential = this.state.credential; 
+      var credential = this.state.credential;
       user.password = this.state.password;
 
       handleSignedInUser(user, credential, this.state.email, this.state.firstName, this.state.lastName);
@@ -179,7 +199,7 @@ class SignUpView extends Component {
 
     this.setState({step: step});
 
-    
+
   }
   //updates state of phone number as you type
   handleChange(event) {
@@ -202,9 +222,13 @@ class SignUpView extends Component {
   handleEmailChange(event) {
     this.setState({email: event.target.value});
   }
-  
+
   handlePasswordChange(event) {
     this.setState({password: event.target.value});
+  }
+
+  handleConfirmPasswordChange(event) {
+    this.setState({confirmPassword: event.target.value});
   }
 
   //prevents screen flash on form submission
@@ -212,18 +236,20 @@ class SignUpView extends Component {
     event.preventDefault();
   }
 
-  
+  changePasswordVisibility() {
+      const newShowPassword = !(this.state.showPassword);
+      this.setState({showPassword: newShowPassword});
+  }
 
 
   //initializes recaptcha and sends sms to phone number
   onSignUpSubmit() {
-    
+
     this.setState({hideCongrats: true});
     this.setState({hideSMS: false});
-     
+
     var phoneNum = this.state.pNum;
-    console.log(phoneNum);
-    document.getElementById("phoneNumPrompt").innerHTML = "Please enter the 6-digit code we just texted to " + phoneNum; 
+    document.getElementById("phoneNumPrompt").innerHTML = "Please enter the 6-digit code we just texted to " + phoneNum;
 
     var appVerifier = new firebase.auth.RecaptchaVerifier("recaptchaContainer", {'size':'invisible'});
     firebase.auth().signInWithPhoneNumber(phoneNum, appVerifier)
@@ -235,7 +261,7 @@ class SignUpView extends Component {
         console.log(confirmationResult);
       })
       .catch(function(error) {
-        console.log("Error: sms not sent" + error); 
+        console.log("Error: sms not sent" + error);
       })
   }
 
@@ -243,78 +269,128 @@ class SignUpView extends Component {
   verify() {
     const confirmationResult = window.confirmationResult;
     var smsCode = this.state.smsCode;
- 
+
 
     if (smsCode) {
 
-      //this creates a credential even if the user doesn't sign in correctly. 
-
-      console.log("this is confirmationRESULT")
-      console.log(confirmationResult);
+      //this creates a credential even if the user doesn't sign in correctly.
       //signs the user in with the smsCode.
       confirmationResult.confirm(smsCode).then(function (result) {
         console.log("Successful login!")
-        var credential = firebase.auth.PhoneAuthProvider.credential(confirmationResult.verificationId, smsCode); 
+        var credential = firebase.auth.PhoneAuthProvider.credential(confirmationResult.verificationId, smsCode);
         // firebase.auth().signInWithCredential(credential);
-        // console.log("yeet")
-        // console.log(credential);
         var user = result.user;
-      
+
         //user and credential are being updated to state here
         this.setState({credential: credential});
         this.setState({user: user});
-        
+
       }.bind(this)).catch(function (error) {
         console.log('Error while checking the verification code', error);
 
-        //if user is not able to sign in correctly, need to null the credential created because it is the wrong credential 
-          
+        //if user is not able to sign in correctly, need to null the credential created because it is the wrong credential
+
       });
     }
 
   }
-  
+
+  renderPassword() {
+      if (this.state.incorrectPassword) {
+          return (
+              <div>
+                  <TextField
+                      error
+                      style={inputStyle}
+                      variant="outlined"
+                      label="Password"
+                      value={this.state.password}
+                      onChange={this.handlePasswordChange}
+                      type="password"
+                  />
+                  <TextField
+                      error
+                      style={inputStyle}
+                      variant="outlined"
+                      label="Password"
+                      value={this.state.confirmPassword}
+                      onChange={this.handleConfirmPasswordChange}
+                      type="password"
+                  />
+              </div>
+          )
+      } else {
+          return (
+              <div>
+                  <TextField
+                      style={inputStyle}
+                      variant="outlined"
+                      label="Password"
+                      value={this.state.password}
+                      onChange={this.handlePasswordChange}
+                      type="password"
+                  />
+                  <TextField
+                      style={inputStyle}
+                      variant="outlined"
+                      label="Password"
+                      value={this.state.confirmPassword}
+                      onChange={this.handleConfirmPasswordChange}
+                      type="password"
+                  />
+              </div>
+          )
+      }
+
+
+
+  }
+
 
   render(){
     const congratsStepStyle = this.state.hideCongrats ? {
       display: 'none',
-      
+
     } : {
-      
+
       background: "rgba(0,0,0,0)",
-    
+
       border: "0 none",
       borderRadius: "10px",
       boxShadow: "0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 6px 10px 0 rgba(0, 0, 0, 0.19)",
       padding: "20px 30px",
       boxSizing: "border-box",
-      
+
       margin: "auto",
       position: "relative",
-    
+
       width: "350px",
       height: "600px",
     };
-    const smsStepStyle = this.state.hideSMS ? {
-      display: 'none',
-      
+    const smsWrapper = this.state.hideSMS ? {
+        visible: 'false',
+        display: 'none'
     } : {
-      
+        visible: 'true',
+    };
+    const smsStepStyle = false ? {
+      display: 'none'
+    } : {
       background: "rgba(0,0,0,0)",
-    
+
       border: "0 none",
       borderRadius: "10px",
       boxShadow: "0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 6px 10px 0 rgba(0, 0, 0, 0.19)",
       padding: "20px 30px",
       boxSizing: "border-box",
-      
+
       margin: "auto",
       position: "relative",
-    
+
       width: "350px",
       height: "600px",
     };
-    
+
     var fieldsetStep = this.state.step;
     // if (this.state.hideCongrats) {
     //   congratsStepStyle.display = "none";
@@ -324,21 +400,20 @@ class SignUpView extends Component {
     // }
 
 
-    
 
-    
+
 
     if (fieldsetStep == 1){
       return(
         <div style={fsParentDiv}>
-          
+
           <fieldset id="phoneNumberStep" style={fieldsetStyle}>
-            
+
             <img src={logo} style={logoStyle} alt="logo"></img>
             <h1 style={headerOneStyle}>Please enter your phone number to continue</h1>
             {/* <TextField style={inputStyle} variant="outlined" type="tel" label="Phone Number" value={this.state.pNum} onChange={this.handleChange} /> */}
             <PhoneInput country="US" style={inputStyle} placeholder="Enter phone number" value={this.state.pNum} onChange={pNum => this.setState({pNum})}></PhoneInput>
-            
+
             <Button style={buttonStyle} variant="contained" color="secondary" onClick={this.handleStepChange}>Next</Button>
           </fieldset>
         </div>
@@ -352,26 +427,27 @@ class SignUpView extends Component {
           <h1 style={headerTwoStyle}>Congrats! You've been invited to TravelFam</h1>
           <p style={pStyle}>TravelFam is an invitation only private network of verified travelers. Your account is ready to be set up</p>
           <Button style={buttonStyle} variant="contained" color="secondary" type="submit" onClick={this.onSignUpSubmit}>Sign Up Now</Button>
-          
+
         </fieldset>
-        
+
         {/* congratsStep fieldset gets hidden, smsCodeStep fieldstep gets shown */}
         {/* TODO: minor error: uncaught promise timeout happens because this fieldset gets removed. i think */}
-        <fieldset id="smsCodeStep" style={smsStepStyle}>
-          <button style={backArrowButtonStyle}><img src={backArrow} style={backArrowStyle} alt="backArrow" /></button>
-          <h1 style={headerTwoStyle} id="phoneNumPrompt"></h1>
-          
-          <TextField style={inputStyle} variant="outlined" label="SMS Code" value={this.state.smsCode} onChange={this.handleCodeChange} />
-          <Button style={buttonStyle} variant="contained" color="secondary" type="submit" onClick={() => {this.verify(); this.handleStepChange()}} id="recaptchaContainer">Verify</Button>
-        </fieldset>
+        <div style={smsWrapper}>
+            <fieldset id="smsCodeStep" style={smsStepStyle}>
+                <button style={backArrowButtonStyle}><img src={backArrow} style={backArrowStyle} alt="backArrow" /></button>
+                <h1 style={headerTwoStyle} id="phoneNumPrompt"></h1>
+                <TextField style={inputStyle} label="SMS Code" variant="outlined" margin="normal" value={this.state.smsCode} onChange={this.handleCodeChange} />
+                <Button style={buttonStyle} variant="contained" color="secondary" type="submit" onClick={() => {this.verify(); this.handleStepChange()}} id="recaptchaContainer">Verify</Button>
+            </fieldset>
+        </div>
         </div>
       )
 
     } else if (fieldsetStep == 3) {
       return(
-        
+
         <div style={fsParentDiv}>
-          
+
           <fieldset id="nameStep" style={fieldsetStyle}>
             <button style={backArrowButtonStyle}><img src={backArrow} style={backArrowStyle} alt="backArrow" /></button>
             <h1 style={headerOneStyle}>What's your name?</h1>
@@ -388,7 +464,7 @@ class SignUpView extends Component {
           <fieldset id="emailStep" style={fieldsetStyle}>
             <button style={backArrowButtonStyle}><img src={backArrow} style={backArrowStyle} alt="backArrow" /></button>
             <h1 style={headerOneStyle}>So that we can contact you. What's your email?</h1>
-            
+
             <TextField style={inputStyle} variant="outlined" label="email" value={this.state.email} onChange={this.handleEmailChange} />
             <Button style={buttonStyle} variant="contained" color="secondary" type="submit" onClick={this.handleStepChange}>Next</Button>
           </fieldset>
@@ -400,8 +476,7 @@ class SignUpView extends Component {
           <fieldset id="passwordStep" style={fieldsetStyle}>
             <button style={backArrowButtonStyle}><img src={backArrow} style={backArrowStyle} alt="backArrow" /></button>
             <h1 style={headerThreeStyle}>Last step...Create a password</h1>
-            
-            <TextField style={inputStyle} variant="outlined" label="Password" value={this.state.password} onChange={this.handlePasswordChange} />
+            {this.renderPassword()}
             <Button style={buttonStyle} variant="contained" color="secondary" type="submit" onClick={this.handleStepChange}>Complete</Button>
           </fieldset>
         </div>

@@ -57,6 +57,7 @@ function refreshData() {
     alert('refresh');
 }
 
+//  <GenreSideBar style={{ marginTop: "20px"}}></GenreSideBar>
 export default function ContentContainer(props) {
     const classes = useStyles();
     return (
@@ -64,7 +65,6 @@ export default function ContentContainer(props) {
             <div className={classes.wrapper}>
 
                 <div className={classes.rowSideBar}>
-                    <GenreSideBar style={{ marginTop: "20px"}}></GenreSideBar>
                     <NetworkSideBar
                         style={{ marginTop: "20px"}}
                         db = {props.db}
@@ -86,6 +86,9 @@ export default function ContentContainer(props) {
                         category = {props.category}
                         channel = {props.channel}
                         channelMap = {props.channelMap}
+                        firebase = {props.firebase}
+                        segueToView = {props.segueToView}
+                        setViewId = {props.setViewId}
                     ></FeedBody>
 
                 </div>

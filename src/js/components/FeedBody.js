@@ -147,7 +147,7 @@ class FeedBody extends Component {
         var currentDate = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
         var currentTime = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
         currentRef.collection("reply").add({
-            id: '0RHvET4AUXlPGr3Ug921',
+            id: this.props.firebase.auth().currentUser.uid,
             message: input,
             replies: 0,
             creationDate: currentDate + "/" + currentTime,
@@ -174,9 +174,7 @@ class FeedBody extends Component {
     }
 
     pullFromDatabase(items, content, prefixPath) {
-        console.log('call');
         if (content === "users") {
-            console.log('users');
             this.props.db.collection("users").get().then(querySnapshot => {
                 console.log("this is the querySnapshot", querySnapshot);
                 var userMap = new Map();
@@ -216,7 +214,6 @@ class FeedBody extends Component {
                 itemsRef = itemsRef.items;
             }
             currentRef.get().then(querySnapshot => {
-                console.log(querySnapshot);
                 querySnapshot.forEach(doc => {
                     // doc.data() is never undefined for query doc snapshots
                     //console.log(doc.id, " => ", doc.data());
@@ -321,7 +318,13 @@ class FeedBody extends Component {
         return (
             <ListItem style={postedBox}>
                 <div style={{marginBottom: "70px"}}>
-                    <AccountTag id={data.id} userMap={this.state.userMap} data={data}></AccountTag>
+                    <AccountTag
+                        id={data.id}
+                        userMap={this.state.userMap}
+                        data={data}
+                        segueToView = {this.props.segueToView}
+                        setViewId = {this.props.setViewId}
+                    ></AccountTag>
                     <div id="outputPost" style={outputPost}>
                         {data.message}
                     </div>
@@ -374,7 +377,7 @@ class FeedBody extends Component {
                         var currentTime = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
                         if (input !== '') {
                             this.props.db.collection("category").doc(this.props.category).collection(this.props.channel).add({
-                                id: '0RHvET4AUXlPGr3Ug921',
+                                id: this.props.firebase.auth().currentUser.uid,
                                 message: input,
                                 replies: 0,
                                 creationDate: currentDate + "/" + currentTime,

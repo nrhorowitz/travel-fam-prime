@@ -4,7 +4,7 @@ import '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import { flexbox } from '@material-ui/system';
 
-const logo = require('../../img/Logo3.png');
+var logo = require('../../img/Logo3.png');
 const useStyles = makeStyles(theme => ({
 
     profilePicture: {
@@ -51,6 +51,11 @@ const useStyles = makeStyles(theme => ({
 
 }));
 
+function directToProfile(inputProps) {
+    inputProps.setViewId(inputProps.id);
+    inputProps.segueToView("ProfileView");
+}
+
 export default function AccountTag(props) {
     const classes = useStyles();
     var name = "";
@@ -59,6 +64,7 @@ export default function AccountTag(props) {
         if ((map.firstName !== undefined) && (map.lastName !== undefined)) {
             name = map.firstName + " " + map.lastName;
         }
+        logo = props.userMap.get(props.id).rawImage;
     } else {
 
     }
@@ -71,14 +77,14 @@ export default function AccountTag(props) {
             <div style={{alignItems: "center", marginBottom: "30px"}}>
 
 
-                <div className={classes.profilePictureBorder}>
+                <div className={classes.profilePictureBorder} onClick={(() => (directToProfile(props)))}>
 
                         <img className={classes.profilePicture} src={logo} alt="logo"/>
 
                 </div>
 
                 <div style={{marginLeft: "60px", paddingTop: "5px"}}>
-                    <div className={classes.profileName}>{name}</div>
+                    <div className={classes.profileName} onClick={(() => (directToProfile(props)))}>{name}</div>
                     <div className={classes.profileLocation}>{time}</div>
                 </div>
 
