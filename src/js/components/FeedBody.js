@@ -143,17 +143,20 @@ class FeedBody extends Component {
     pullFromDatabase(items, content, prefixPath) {
         if (content === "users") {
             this.props.db.collection("users").get().then(querySnapshot => {
+                console.log("this is the querySnapshot", querySnapshot);
                 var userMap = new Map();
                 querySnapshot.forEach(doc => {
                     // doc.data() is never undefined for query doc snapshots
                     //console.log(doc.id, " => ", doc.data());
                     userMap.set(doc.id, doc.data());
                 });
+
                 this.setState({userMap: userMap});
             }).catch(err => {
                 console.log('Error getting document', err);
             });
         } else if (content === "feed") {
+<<<<<<< HEAD
             const pathArray = prefixPath.split("/");
             const currentRef = this.props.db.collection("category").doc(pathArray[0]).collection(pathArray[1]).doc("feedData");
             currentRef.get().then(doc => {
@@ -164,6 +167,29 @@ class FeedBody extends Component {
                     const id = (doc.data().feedData[i]).split("<I>")[0];
                     const data = doc.data().feedData[i];
                     newItems.push({id, data});
+=======
+            var currentRef = this.props.db.collection("category");
+            var pathArray = prefixPath.split("/");
+            var itemsRef = this.state;
+            console.log("this is the itemsRef", itemsRef);
+            if (items.length === 0) { //RESET IF FIRST
+                itemsRef.items = [];
+            }
+            for (var i = 0; i < pathArray.length; i += 2) {
+                currentRef = currentRef.doc(pathArray[i]);
+                currentRef = currentRef.collection(pathArray[i + 1]);
+                for (var j = 0; j < itemsRef.length; j += 1) {
+                    console.log("this is the itemsRef[j].id", itemsRef[j].id);
+                    console.log("this is the pathArray[i]", pathArray[i])
+                    if (itemsRef[j].id === pathArray[i]) {
+                        
+                        itemsRef = itemsRef[j].data;
+                        break;
+                    }
+                }
+                if (itemsRef.items === undefined) {
+                    itemsRef.items = [];
+>>>>>>> 4de55578f1758a1349d3e0971d7022bf608938fd
                 }
                 console.log(newItems);
                 this.setState({items: newItems}); //*****

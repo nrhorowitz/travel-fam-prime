@@ -18,6 +18,7 @@ import firebase from 'firebase';
 import 'firebase/auth';
 import LoginView from './LoginView';
 import ProfileView from './ProfileView.js';
+import MessageBase from './MessageBase';
 
 const db = firebase.firestore();
 
@@ -59,11 +60,12 @@ class App extends Component {
         });
 
         // this.segueToView("LandingPageView");
-
+        // this.segueToView("DashBoardView");
         //this.segueToView("SMSVerificationView");
-
+        // this.segueToView("SignUpView");
         // this.segueToView("ProfileView");
         // this.segueToView("LoginView");
+        this.segueToView("MessageBase");
     }
 
     // componentWillUnmount() {
@@ -222,7 +224,17 @@ class App extends Component {
                 >
                 </ProfileView>
             )
-        } else if (this.state.currentView === "LoginView"){
+        } else if (this.state.currentView === "MessageBase") {
+            return ( 
+                <MessageBase
+                    segueToView = {this.segueToView}
+                >
+
+                </MessageBase>
+            )
+        }
+        
+        else if (this.state.currentView === "LoginView"){
             return (
                 <LoginView
                     segueToView = {this.segueToView}
