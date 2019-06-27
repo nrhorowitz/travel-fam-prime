@@ -69,8 +69,8 @@ export default function AccountTag(props) {
 
     }
     var time = ""; //TODO: RELATIVE TIMING
-    if ((props.data !== undefined) && (props.data.date !== undefined)) {
-        time = "Berkeley, CA - " + props.data.date;
+    if (props.date !== undefined) {
+        time = "Berkeley, CA - " + props.date;
     }
     return (
         <div>

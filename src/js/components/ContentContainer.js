@@ -6,6 +6,7 @@ import GenreSideBar from './GenreSideBar';
 import NetworkSideBar from './NetworksSideBar';
 import FeedHeader from './FeedHeader';
 import FeedBody from './FeedBody';
+import CreateListingPage from './CreateListingPage';
 // import FeedContent from './FeedContent'
 import '../../css/App.css'
 
@@ -53,47 +54,73 @@ const useStyles = makeStyles(theme => ({
 
 }));
 
-function refreshData() {
-    alert('refresh');
+var createListing = false;
+
+function renderBody(props) {
+    if (createListing) {
+        return (
+            <div>
+                CREATE LISTING
+            </div>
+        )
+    } else {
+        return (
+            <div>
+                <FeedHeader
+                    category = {props.category}
+                    channel = {props.channel}
+                    channelMap = {props.channelMap}
+                    segueToView = {props.segueToView}
+                ></FeedHeader>
+                <FeedBody
+                    db = {props.db}
+                    category = {props.category}
+                    channel = {props.channel}
+                    channelMap = {props.channelMap}
+                    firebase = {props.firebase}
+                    segueToView = {props.segueToView}
+                    setViewId = {props.setViewId}
+                    writeToDatabase = {props.writeToDatabase}
+                ></FeedBody>
+            </div>
+        )
+    }
 }
 
 //  <GenreSideBar style={{ marginTop: "20px"}}></GenreSideBar>
 export default function ContentContainer(props) {
     const classes = useStyles();
-    return (
-        <Container className={classes.container}>
-            <div className={classes.wrapper}>
+    if (props.type === "dashboard") {
+        return (
+            <Container className={classes.container}>
+                <div className={classes.wrapper}>
 
-                <div className={classes.rowSideBar}>
-                    <NetworkSideBar
-                        style={{ marginTop: "20px"}}
-                        db = {props.db}
-                        category = {props.category}
-                        channel = {props.channel}
-                        channelMap = {props.channelMap}
-                        changeCategory = {props.changeCategory}
-                        changeChannel = {props.changeChannel}
-                    ></NetworkSideBar>
-                </div>
-                <div className={classes.feed}>
-                    <FeedHeader
-                        category = {props.category}
-                        channel = {props.channel}
-                        channelMap = {props.channelMap}
-                    ></FeedHeader>
-                    <FeedBody
-                        db = {props.db}
-                        category = {props.category}
-                        channel = {props.channel}
-                        channelMap = {props.channelMap}
-                        firebase = {props.firebase}
-                        segueToView = {props.segueToView}
-                        setViewId = {props.setViewId}
-                    ></FeedBody>
+                    <div className={classes.rowSideBar}>
+                        <NetworkSideBar
+                            style={{ marginTop: "20px"}}
+                            db = {props.db}
+                            category = {props.category}
+                            channel = {props.channel}
+                            channelMap = {props.channelMap}
+                            changeCategory = {props.changeCategory}
+                            changeChannel = {props.changeChannel}
+                        ></NetworkSideBar>
+                    </div>
+                    <div className={classes.feed}>
+                        {renderBody(props)}
+                    </div>
 
                 </div>
+            </Container>
+        );
+    } else if (props.type === "createlisting") {
+        return (
+            <Container className={classes.container}>
+                <div className={classes.wrapper}>
+                    <CreateListingPage></CreateListingPage>
+                </div>
+            </Container>
+        );
+    }
 
-            </div>
-        </Container>
-    );
 }

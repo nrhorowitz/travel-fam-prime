@@ -26,17 +26,32 @@ const useStyles = makeStyles(theme => ({
 
 export default function FeedHeader(props) {
     const classes = useStyles();
+    const data = props.channelMap.get(props.category);
+    var currentDataArray = [];
+    for (var i = 0; i < data.length; i += 1) {
+        var dataArray = data[i].split("/");
+        if (dataArray[0] === props.channel) {
+            currentDataArray = dataArray;
+            break;
+        }
+    }
+    var date = '';
+    date += currentDataArray[2];
+    date += currentDataArray[3];
     return (
         <div>
+            <Typography variant="h3">
+                {currentDataArray[1]}
+            </Typography>
             <Typography variant="h4">
-                {props.channel}
+                {date}
+            </Typography>
+            <Typography variant="h4">
+                {currentDataArray[5]}
             </Typography>
             <Grid container spacing={24}>
-                <Grid item xs={6}>
-                    <Button fullWidth={true} variant="contained" color="secondary">Rooms Offered</Button>
-                </Grid>
-                <Grid item xs={6}>
-                    <Button fullWidth={true} variant="contained" color="secondary">Rooms Needed</Button>
+                <Grid item xs={3}>
+                    <Button fullWidth={true} variant="contained" color="secondary" onClick={() => props.segueToView("CreateListingView")}>CREATE A LISTING</Button>
                 </Grid>
             </Grid>
         </div>

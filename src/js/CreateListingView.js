@@ -2,13 +2,16 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import Button from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography';
 import AppNavBar from './components/AppNavBar.js';
 import ContentContainer from './components/ContentContainer.js';
+import Container from '@material-ui/core/Container';
+import { fade, makeStyles } from '@material-ui/core/styles';
 import '../css/App.css';
 
 var uniqid = require('uniqid');
 
-class DashBoardView extends React.Component {
+class CreateListingView extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -148,7 +151,7 @@ class DashBoardView extends React.Component {
                         segueToView = {this.props.segueToView}
                         setViewId = {this.props.setViewId}
                         writeToDatabase = {this.writeToDatabase}
-                        type = "dashboard"
+                        type = "createlisting"
                     ></ContentContainer>
                 </div>
             )
@@ -160,4 +163,4 @@ class DashBoardView extends React.Component {
 
 
 
-export default DashBoardView;
+export default CreateListingView;

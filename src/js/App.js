@@ -5,6 +5,7 @@ import '../css/App.css';
 import LandingPageView from './LandingPageView.js';
 import EditProfileView from './EditProfileView.js';
 import DashBoardView from './DashBoardView.js';
+import CreateListingView from './CreateListingView.js';
 import SMSVerificationView from './SMSVerificationView.js';
 import LoginWithPasswordView from './LoginWithPasswordView.js';
 import InvitedByView from './InvitedByView.js';
@@ -260,6 +261,16 @@ class App extends Component {
         } else if (this.state.currentView === "DashBoardView") {
             return (
                 <DashBoardView
+                    segueToView = {this.segueToView}
+                    db = {db}
+                    currentUser = {firebase.auth().currentUser}
+                    setViewId = {this.setViewId}
+                    firebase = {firebase}
+                />
+            )
+        } else if (this.state.currentView === "CreateListingView") {
+            return (
+                <CreateListingView
                     segueToView = {this.segueToView}
                     db = {db}
                     currentUser = {firebase.auth().currentUser}

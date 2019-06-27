@@ -7,6 +7,8 @@ import TextField from '@material-ui/core/TextField';
 import uuid from 'uuid';
 import { textAlign } from '@material-ui/system';
 import ReplyBox from './ReplyBox';
+import Grid from '@material-ui/core/Grid';
+import Typography from '@material-ui/core/Typography';
 
 const postBox = {
     backgroundColor: "#FFFFFF",
@@ -112,7 +114,6 @@ class FeedBody extends Component {
         this.readSinglePost = this.readSinglePost.bind(this);
         this.readSinglePostRecursive = this.readSinglePostRecursive.bind(this);
         this.pullFromDatabase = this.pullFromDatabase.bind(this);
-        this.writeToDatabase = this.writeToDatabase.bind(this);
         this.toggleReplyBoxVisible = this.toggleReplyBoxVisible.bind(this);
         this.getVisibleFromPath = this.getVisibleFromPath.bind(this);
         this.showReplyBox = this.showReplyBox.bind(this);
@@ -124,41 +125,7 @@ class FeedBody extends Component {
         this.pullFromDatabase([], "feed", this.props.category + "/" + this.props.channel);
     }
 
-    writeToDatabase(input, prefixPath) {
-        var currentRef = this.props.db.collection("category");
-        var pathArray = prefixPath.split("/");
-        var itemsRef = this.state;
-        for (var i = 0; i < pathArray.length; i += 1) {
-            if (i % 2 === 0) {
-                currentRef = currentRef.doc(pathArray[i]);
-            } else {
-                currentRef = currentRef.collection(pathArray[i]);
-            }
-        }
-        //UPDATE REPLIES ON COMMENTED
-        currentRef.get().then(querySnapshot => {
-            var prevReplyCount = querySnapshot.data().replies;
-            currentRef.update({replies: prevReplyCount+1});
-        }).catch(err => {
-            console.log('Error getting document', err);
-        });
 
-        var today = new Date();
-        var currentDate = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-        var currentTime = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-        currentRef.collection("reply").add({
-            id: this.props.firebase.auth().currentUser.uid,
-            message: input,
-            replies: 0,
-            creationDate: currentDate + "/" + currentTime,
-            date: currentDate + "/" + currentTime,
-        }).then(() => {
-            console.log('added');
-        }).catch(err => {
-            console.log('Error getting document', err);
-        });
-        this.pullFromDatabase([], "feed", this.props.category + "/" + this.props.channel);
-    }
 
     pushItemSorted(list, id, data) {
         var date = data.date;
@@ -187,38 +154,19 @@ class FeedBody extends Component {
                 console.log('Error getting document', err);
             });
         } else if (content === "feed") {
-            var currentRef = this.props.db.collection("category");
-            var pathArray = prefixPath.split("/");
-            var itemsRef = this.state;
-            if (items.length === 0) { //RESET IF FIRST
-                itemsRef.items = [];
-            }
-            for (var i = 0; i < pathArray.length; i += 2) {
-                currentRef = currentRef.doc(pathArray[i]);
-                currentRef = currentRef.collection(pathArray[i + 1]);
-                for (var j = 0; j < itemsRef.length; j += 1) {
-                    if (itemsRef[j].id === pathArray[i]) {
-                        itemsRef = itemsRef[j].data;
-                        break;
-                    }
+            const pathArray = prefixPath.split("/");
+            const currentRef = this.props.db.collection("category").doc(pathArray[0]).collection(pathArray[1]).doc("feedData");
+            currentRef.get().then(doc => {
+                var newItems = [];
+                console.log(doc.data());
+                for (var i = 0; i < doc.data().feedData.length; i += 1) {
+                    console.log(doc.data().feedData[i]);
+                    const id = (doc.data().feedData[i]).split("<I>")[0];
+                    const data = doc.data().feedData[i];
+                    newItems.push({id, data});
                 }
-                if (itemsRef.items === undefined) {
-                    itemsRef.items = [];
-                }
-                itemsRef = itemsRef.items;
-            }
-            currentRef.get().then(querySnapshot => {
-                querySnapshot.forEach(doc => {
-                    // doc.data() is never undefined for query doc snapshots
-                    //console.log(doc.id, " => ", doc.data());
-
-                    this.pushItemSorted(itemsRef, doc.id, doc.data()); //TODO: remove other
-                    //itemsRef.push({id: doc.id, data: doc.data(), replyBox: false}); //timestamp is the max time of all elements in tree - deleting new reply will cause post to go back down
-                    if (doc.data().replies > 0) {
-                        this.pullFromDatabase(doc.data(), "feed", prefixPath + "/" + doc.id + "/reply");
-                    }
-                });
-                this.setState({items: this.state.items}); //*****
+                console.log(newItems);
+                this.setState({items: newItems}); //*****
             }).catch(err => {
                 console.log('Error getting document', err);
             });
@@ -292,7 +240,7 @@ class FeedBody extends Component {
     showReplyBox(id, data, path) {
         if (this.getVisibleFromPath(path)) {
             return (
-                <ReplyBox id={path} writeToDatabase={this.writeToDatabase} visible={(() => (this.getVisibleFromPath(path)))} toggleReplyBoxVisible={this.toggleReplyBoxVisible}></ReplyBox>
+                <ReplyBox id={path} writeToDatabase={this.props.writeToDatabase} visible={(() => (this.getVisibleFromPath(path)))} toggleReplyBoxVisible={this.toggleReplyBoxVisible}></ReplyBox>
             )
         } else {
             return (
@@ -303,33 +251,49 @@ class FeedBody extends Component {
     }
 
     readSinglePost(id, data, path) {
+        const dataArray = data.split("<P>")[0];
+        const replyCount = dataArray.split("<I>")[4];
         var replyString = "";
-        if (data.replies === 0) {
+        if (parseInt(replyCount) === 0) {
             replyString = " Comment";
         } else {
-            replyString = " " + data.replies + " Comments";
+            replyString = " " + parseInt(replyCount) + " Comments";
         }
         return (
             <ListItem style={postedBox}>
-                <div style={{marginBottom: "70px"}}>
-                    <AccountTag
-                        id={data.id}
-                        userMap={this.state.userMap}
-                        data={data}
-                        segueToView = {this.props.segueToView}
-                        setViewId = {this.props.setViewId}
-                    ></AccountTag>
-                    <div id="outputPost" style={outputPost}>
-                        {data.message}
-                    </div>
-                    <div style={footerGroup}>
-                        <div style={footerText}><img style={footerImages} src={interested_svg} alt="star"/> Interested</div>
-                        <button onClick={(() => (this.toggleReplyBoxVisible(path)))} style={footerText}><img style={footerImages} src={reply_svg} alt="reply"/>{replyString}</button>
-                        <div style={footerText}><img style={footerImages} src={share_svg} alt="reply"/> Share</div>
-                    </div>
-                    {this.showReplyBox(id, data, path)}
-                    {this.readSinglePostRecursive(data.id, data.items, path)}
-                </div>
+                <Grid container spacing={3}>
+                    <Grid item xs={12}>
+                        <Typography variant="h4">
+                            TITLE OF LISTING
+                        </Typography>
+                    </Grid>
+                    <Grid item xs={3}>
+                        PHOTO
+                    </Grid>
+                    <Grid item xs={9}>
+                        <div style={{marginBottom: "70px"}}>
+                            <AccountTag
+                                id={dataArray.split("<I>")[1]}
+                                userMap={this.state.userMap}
+                                date={dataArray.split("<I>")[3]}
+                                segueToView = {this.props.segueToView}
+                                setViewId = {this.props.setViewId}
+                            ></AccountTag>
+                            <div id="outputPost" style={outputPost}>
+                                {dataArray.split("<I>")[5]}
+                            </div>
+                        </div>
+                    </Grid>
+                    <Grid item xs={12}>
+                        <div style={footerGroup}>
+                            <div style={footerText}><img style={footerImages} src={interested_svg} alt="star"/> Interested</div>
+                            <button onClick={(() => (this.toggleReplyBoxVisible(path)))} style={footerText}><img style={footerImages} src={reply_svg} alt="reply"/>{replyString}</button>
+                            <div style={footerText}><img style={footerImages} src={share_svg} alt="reply"/> Share</div>
+                        </div>
+                        {this.showReplyBox(id, data, path)}
+                        {this.readSinglePostRecursive(data.id, data.items, path)}
+                    </Grid>
+                </Grid>
             </ListItem>
         )
     }
@@ -341,6 +305,7 @@ class FeedBody extends Component {
             );
         } else {
             var path = this.props.category + "/" + this.props.channel;
+            console.log(this.state.items);
             return (
                 <List>
                     {this.state.items.map(({id, data}) => (
@@ -355,41 +320,6 @@ class FeedBody extends Component {
     readBody() {
         return(
             <div>
-
-                {/* Make a post textarea */}
-                <div style={postBox}>
-                    <TextField id="inputPost" style={postArea} label="CREATE POST" rows="5" multiline></TextField>
-
-                    {/* Post Button */}
-                    <Button style={postButton} variant="contained" color="secondary" onClick={() => {
-                        var input = document.getElementById("inputPost").value
-                        //reset post area to nothing after posting
-                        document.getElementById("inputPost").value="";
-                        //if post had text, add new post to state
-                        var today = new Date();
-                        var currentDate = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-                        var currentTime = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-                        if (input !== '') {
-                            this.props.db.collection("category").doc(this.props.category).collection(this.props.channel).add({
-                                id: this.props.firebase.auth().currentUser.uid,
-                                message: input,
-                                replies: 0,
-                                creationDate: currentDate + "/" + currentTime,
-                                date: currentDate + "/" + currentTime
-                            }).then(() => {
-                                console.log('added');
-                            }).catch(err => {
-                                console.log('Error getting document', err);
-                            });
-                            this.componentDidMount();
-                            //this.pullFromDatabase([], "feed", this.state.category + "/" + this.state.channel);
-                        }
-                    }}>
-
-                        POST
-
-                    </Button>
-                </div>
                 {this.readPosts()}
             </div>
         );
