@@ -15,7 +15,7 @@
     "react-phone-number-input": "^2.3.17",
     "react-redux-firebase": "^2.2.6",
     "react-router-dom": "^4.4.0-beta.8",
-    "react-scripts": "3.0.1",
+    "react-scripts": "5.0.1",
     "react-upload-file": "^2.0.0-beta.6",
     "redux-firestore": "^0.8.0",
     "uniqid": "^5.0.3",
